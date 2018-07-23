@@ -2,7 +2,7 @@
   <div id="app">
     <div id="nav">
       <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+      <router-link to="/msg">msg</router-link>
     </div>
     <div class='view'>
         <router-view/>
@@ -22,7 +22,7 @@
 .view{
   margin: 0 auto;
   width: 320px;
-  height: 400px;
+  height: 500px;
   overflow: hidden;
   border-radius:6px;
   box-shadow:0px 0px 8px rgb(173, 173, 173);

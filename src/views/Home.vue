@@ -18,6 +18,40 @@
            <div class='home-nickname'>高明强</div>
            <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
          </div>
+         <div class='home-time'>09:00</div>
+       </div>
+       <div class='home-item'>
+         <div class="img-header">
+           <div class='img-default'></div>
+           <!-- <img src="" class="img-header"> -->
+         </div>
+         <div class='home-cent'>
+           <div class='home-nickname'>高明强</div>
+           <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
+         </div>
+         <div class='home-time'>09:00</div>
+       </div>
+       <div class='home-item'>
+         <div class="img-header">
+           <div class='img-default'></div>
+           <!-- <img src="" class="img-header"> -->
+         </div>
+         <div class='home-cent'>
+           <div class='home-nickname'>高明强</div>
+           <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
+         </div>
+         <div class='home-time'>09:00</div>
+       </div>
+       <div class='home-item'>
+         <div class="img-header">
+           <div class='img-default'></div>
+           <!-- <img src="" class="img-header"> -->
+         </div>
+         <div class='home-cent'>
+           <div class='home-nickname'>高明强</div>
+           <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
+         </div>
+         <div class='home-time'>09:00</div>
        </div>
      </div>
   </div>
@@ -25,13 +59,8 @@
 
 <script>
 // @ is an alias to /src
-import Message from '@/components/Message.vue'
-
 export default {
-  name: 'home',
-  components: {
-    Message
-  }
+  name: 'home'
 }
 </script>
 
@@ -75,20 +104,27 @@ $HEAD_H:40px;
   min-height: 580px;
   overflow-x: hidden;
   overflow-y: auto;
+  color: #333;
   .home-item{
-    height: 45px;
-    border-bottom: 1px solid #ddd;
+    height: 50px;
+    border-bottom: 1px solid rgb(235, 235, 235);
     line-height: 43px;
-    background: #f5f5f5;
+    cursor: pointer;
+    &:hover{
+      background: #F5F5F5;
+    }
+    &:active{
+      background: #F5F5F5;
+    }
     .img-header{
       // width: 40px;
       height: 100%;
       display: inline-block;
       margin: 0 10px;
       .img-default{
-        width: 30px;
-        height: 30px;
-        background: green;
+        width: 32px;
+        height: 32px;
+        background: #d1d1d1;
         border-radius:50%; 
         vertical-align: 4px;
         display: inline-block;
@@ -97,8 +133,12 @@ $HEAD_H:40px;
     .home-cent{
       display: inline-block;
       .home-nickname{
-        line-height: 24px;
+        line-height: 26px;
         font-size: 12px;
+        width: 200px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
       }
       .home-message{
         font-size: 12px;
@@ -106,11 +146,19 @@ $HEAD_H:40px;
         transform:scale(0.90,0.90);
         margin-left:-12px;
         width: 220px;
-        color: #666;
-        overflow:hidden;//超出一行文字自动隐藏
-        text-overflow:ellipsis;//文字隐藏后添加省略号
-        white-space:nowrap;//强制不换行  
+        color: #777;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
       }
+    }
+    .home-time{
+      display: inline-block;
+      line-height: 20px;
+      font-size:12px;
+      vertical-align: top;
+      margin-top:4px;
+      color: #A59999; 
     }
   }
   
