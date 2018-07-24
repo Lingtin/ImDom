@@ -76,11 +76,21 @@
 </template>
 
 <script>
+import { Login } from './../api/api.js';
+
 export default {
   name:"msg",
   data(){
     return {
 
+    }
+  },
+  mounted(){
+
+  },
+  methods:{
+    init(){
+      
     }
   }
 }
