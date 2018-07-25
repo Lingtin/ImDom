@@ -15,7 +15,7 @@
            <!-- <img src="" class="img-header"> -->
          </div>
          <div class='home-cent'>
-           <div class='home-nickname'>高明强</div>
+           <div class='home-nickname'>高明强1</div>
            <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
          </div>
          <div class='home-time'>09:00</div>
@@ -58,16 +58,14 @@
 </template>
 
 <script>
+
 export default {
   name: 'home',
   mounted(){
     
   },
   methods:{
-    init(){
-     
-
-    }
+    
   }
 }
 </script>

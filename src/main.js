@@ -1,11 +1,11 @@
 import App from './App.vue'
 import Vue from 'vue'
 import router from './router'
-import stom from './api/stom.api.js'
+import stom from './api/stom.connect.js'
 
 Vue.config.productionTip = false
 
-stom();
+stom.init();
 
 new Vue({
   router,

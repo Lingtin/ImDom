@@ -76,7 +76,7 @@
 </template>
 
 <script>
-import { Login } from './../api/api.js';
+import stom from './../api/stom.connect.js';
 
 export default {
   name:"msg",
@@ -89,8 +89,8 @@ export default {
 
   },
   methods:{
-    init(){
-      
+    sendMessage(){
+      stom.sendMessage("123")
     }
   }
 }
