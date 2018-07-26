@@ -15,6 +15,11 @@ export default new Router({
       path: '/msg',
       name: 'msg',
       component:(resolve)=>require(['@/views/msg.vue'],resolve)
+    },
+    {
+      path: '/ss',
+      name: 'ss',
+      component:(resolve)=>require(['@/views/sss.vue'],resolve)
     }
   ]
 })

@@ -76,8 +76,6 @@
 </template>
 
 <script>
-import stom from './../api/stom.connect.js';
-
 export default {
   name:"msg",
   data(){
@@ -90,7 +88,7 @@ export default {
   },
   methods:{
     sendMessage(){
-      stom.sendMessage("123")
+      
     }
   }
 }

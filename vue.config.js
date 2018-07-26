@@ -4,14 +4,14 @@ module.exports = {
     // devServer: {
     //     proxy: {
     //       '/api': {
-    //         target: 'https://chat.ximiyun.cn/',
+    //         target: 'https://chat.ximiyun.cn/chat/',
     //         ws: true,
     //         changeOrigin: true
     //       }
     //     }
     //   }
-    devServer: {
-        https: true,
-        hot: true
-    }
+    // devServer: {
+    //     https: true,
+    //     hot: true
+    // }
 }

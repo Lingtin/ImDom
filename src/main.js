@@ -1,13 +1,16 @@
+import 'vant/lib/vant-css/index.css';
+
 import App from './App.vue'
+import Vant from 'vant';
 import Vue from 'vue'
 import router from './router'
-import stom from './api/stom.connect.js'
+import store from './store'
 
+Vue.use(Vant);
 Vue.config.productionTip = false
-
-stom.init();
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

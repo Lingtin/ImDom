@@ -1,9 +1,5 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/msg">msg</router-link>
-    </div>
     <div class='view'>
         <router-view/>
     </div>
@@ -24,9 +20,9 @@ input,textarea{
 }
 .view{
   margin: 0 auto;
-  width: 320px;
-  height: 510px;
-  overflow: hidden;
+  // width: 320px;
+  // height: 510px;
+  // overflow: hidden;
   border-radius:6px 6px 0px 0px;
   box-shadow:0px 0px 8px rgb(173, 173, 173);
 }
