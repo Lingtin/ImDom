@@ -10,6 +10,8 @@
   "dependencies": {
     "@stomp/stompjs": "^4.0.7",
     "axios": "^0.18.0",
+    "moment": "^2.22.2",
+    "qs": "^6.5.2",
     "sockjs-client": "^1.1.5",
     "vant": "^1.1.14",
     "vant-doc": "^1.0.7",

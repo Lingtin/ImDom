@@ -1,0 +1,127 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
+<script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.js"></script>
+
+
+<body onload="disconnect()">
+<div>
+    <div>
+        <label>我的id</label>
+        <input type="text" id="name"/>
+        <button id="connect" onclick="connect();">登录</button>
+        <button id="disconnect" disabled="disabled" onclick="disconnect();">断开连接</button>
+    </div>
+
+    <div id="conversationDIV">
+        </br>
+        <textarea id="content" role="3"></textarea>
+        </br>
+        <label>发送给</label>
+        <input type="text" id="toname"/>
+        </br>
+        <button id="sendName" onclick="sendName();">发送</button>
+        <p id="response"></p>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    var stompClient = null;
+    var host = "http://localhost";
+    // var host = "http://127.0.0.1:10005";
+    // var host = "https://api.ximiyun.cn";
+
+    function setConnected(connected){
+        document.getElementById('connect').disabled = connected;
+        document.getElementById('disconnect').disabled = !connected;
+        document.getElementById('conversationDIV').style.visibility = connected ? 'visible':'hidden';
+    }
+
+    function connect(){
+        var name = $("#name").val();
+        $.ajax({
+            url:host+"/chat/user/login",
+            data:{token:name},
+            success:function (json) {
+                if(json.success==1){
+                    alert("登录成功");
+                    //链接Socket的endpoint名称为endpointWisely
+                    var socket = new SockJS(host+'/chat/init');
+                    //使用STOMP子协议的WebSocket客户端
+                    stompClient = Stomp.over(socket);
+
+
+                    $.ajax({
+                            type:"post",
+                            url:host+"/chat/user/selectChatRelationList",
+                            data:{user_id:json.data.user_id},
+                            success:function (respons) {
+                                console.log(respons);
+                            },
+                            async:false}
+                    )
+                }else{
+                    alert(json.msg)
+                }
+
+
+            },
+            async:false}
+    )
+
+
+        //链接WebSocket服务端
+        stompClient.connect({},function (frame) {
+            setConnected(true);
+            //通过stompClient.subscribe订阅/topic/getResponse目标发送的消息，即控制器中的@SendTo
+            stompClient.subscribe(host+'/user/chat/tomessage',function (response) {
+                showResponse(JSON.parse(response.body));
+            });
+        });
+    }
+
+    function disconnect(){
+        if(stompClient != null){
+            stompClient.disconnect();
+        }
+        setConnected(false);
+        console.log("Disconnecteed");
+    }
+
+    function sendName(){
+        var name = $("#name").val();
+        var toname = $('#toname').val();
+        var content = $("#content").val();
+        var message = {
+            my_user_id: name,
+            to_user_id: toname,
+            message: content
+        };
+        $('#response').append(
+            $('#response').val() +
+            '我: '+
+            content + '<br/>');
+        stompClient.send(host+"/chat/inmessage",{},JSON.stringify(message));
+    }
+
+    function showResponse(message){
+        $('#response').append(
+            $('#response').val() +
+            message.to_user_id+': '+
+            message.message + '<br/>');
+    }
+
+</script>
+
+
+</body>
+</html>

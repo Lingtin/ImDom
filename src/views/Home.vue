@@ -1,57 +1,52 @@
 <template>
   <div class="home">
-     <!-- <div class='home-header'>
+     <div class='home-header'>
        <div class='home-headeimg'>
          <div class='home-imgbox'></div>
        </div>
        <div class='home-title'>title</div>
        <div></div>
-     </div> -->
-
+     </div>
      <div class='home-list'>
        <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-      
-        <p>刷新次数: {{ count }}</p>
-            <div class='home-item'>
+            <div class='home-item' v-for='item in userList'>
               <div class="img-header">
                 <div class='img-default'></div>
                 <!-- <img src="" class="img-header"> -->
               </div>
-              <div class='home-cent'>
-                <div class='home-nickname'>高明强1</div>
-                <div class='home-message'>但是它却不会按照max-width:979px的样式</div>
+              <div class='home-cent' @click="onchatname(item)">
+                <div class='home-nickname'>{{item.to_nick_name}}</div>
+                <div class='home-message'>{{item.finally_chat_message}}</div>
               </div>
-              <div class='home-time'>09:00</div>
+              <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
             </div>
-       </van-pull-refresh>
+            </van-pull-refresh>
      </div>
   </div>
 </template>
 
 <script>
 import {mapState,mapMutations} from 'vuex';
-import {selectUserInfo} from '@/api/api.js';
 import { PullRefresh  } from 'vant';
+import {selectChatRelationList} from '@/api/api.js';
+
 export default {
   name: 'home',
   data() {
     return {
       count: 0,
       isLoading: false,
-      columns: ['杭州', '宁波', '温州', '嘉兴', '湖州']
+      show:false
     }
   },
   components:{
     [PullRefresh.name]:PullRefresh
   },
   mounted(){
-    this.$store.dispatch('init');
+    
   },
-  computed:{...mapState(["userids"])},
+  computed:{...mapState(["userids","userList"])},
   methods:{
-    onChange(picker, value, index) {
-      Toast(`当前值：${value}, 当前索引：${index}`);
-    },
     onRefresh() {
       setTimeout(() => {
         this.$toast('刷新成功');
@@ -59,21 +54,8 @@ export default {
         this.count++;
       }, 500);
     },
-    onClose(clickPosition, instance) {
-      switch (clickPosition) {
-        case 'left':
-        case 'cell':
-        case 'outside':
-          instance.close();
-          break;
-        case 'right':
-          Dialog.confirm({
-            message: '确定删除吗？'
-          }).then(() => {
-            instance.close();
-          });
-          break;
-      }
+    onchatname(item){
+      this.$router.push({path:"msg",query:item})
     }
   }
 }
@@ -88,6 +70,7 @@ $HEAD_H:40px;
   background: #3EA5FF;
   text-align: center;
   line-height: $HEAD_H;
+  z-index: 100;
   >div{
     float: left;
   }
@@ -116,10 +99,9 @@ $HEAD_H:40px;
 .home-list{
   // background: #f5f5f5;
   width: 100%;
-  min-height: 580px;
-  overflow-x: hidden;
-  overflow-y: auto;
   color: #333;
+  height: calc(100vh - 40px);
+  overflow-y:auto;
   .home-item{
     height: 50px;
     border-bottom: 1px solid rgb(235, 235, 235);

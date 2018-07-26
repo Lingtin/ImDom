@@ -1,13 +1,16 @@
 import axios from 'axios';
+import qs from 'qs';
 
 export const apiUrl = "http://localhost";
 // https://chat.ximiyun.cn
-axios.create({
-    baseURL: '',
-    timeout: 1000,
-    // headers: {'X-Custom-Header': 'foobar'}
-});
+// axios.create({
+//     baseURL: '',
+//     timeout: 1000,
+// });
 
+axios.defaults.headers = {
+    "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8 "
+};
 axios.defaults.withCredentials=true;
 /**
  * @name login 登陆 ${apiUrl}/chat/user/login {params: parmes}
@@ -18,14 +21,13 @@ export const Login = (parmes) =>{return axios.get(`${apiUrl}/chat/user/login`,{p
  * @name 查询联系人列表  ${apiUrl}/chat/user/selectChatRelationList
  */
 export const selectChatRelationList = (parmes) =>{
-    return axios.post(`${apiUrl}/chat/user/selectChatRelationList`,
-    parmes).then((res) => res.data).catch(error=>error)
+    return axios.post(`${apiUrl}/chat/user/selectChatRelationList`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)
 };
 
 /**
  * @name 查询账号信息 ${apiUrl}/chat/user/selectUserInfo
  */
-export const selectUserInfo = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
+export const selectUserInfo = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
 
 /**
  * @name 删除联系人 ${apiUrl}/chat/user/delectChatRelation
@@ -35,7 +37,7 @@ export const delectChatRelation = (parmes) =>{return axios.post(`${apiUrl}/chat/
 /**
  * @name 查询聊天记录 ${apiUrl}/chat/user/selectChatLogsList
  */
-export const selectChatLogsList = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
+export const selectChatLogsList = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectChatLogsList`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
 
 /**
  * @name 连接socket ${apiUrl}/chat/init
@@ -61,3 +63,4 @@ export const selectChatLogsList = (parmes) =>{return axios.post(`${apiUrl}/chat/
 * @name 查询和对方的未读消息总数 ${apiUrl}/chat/user/selectNotReadCountNumber
 */
 // export const delectChatRelation = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
+

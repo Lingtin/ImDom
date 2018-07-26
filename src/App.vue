@@ -6,6 +6,15 @@
   </div>
 </template>
 
+<script>
+export default {
+  created(){
+    this.$store.dispatch('init');
+  }
+}
+</script>
+
+
 <style lang="scss">
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -14,6 +23,11 @@
   box-sizing: border-box;
   -webkit-text-size-adjust:none;
   color: #333;
+  overflow-x: hidden;
+}
+html,body{
+  width: 100%;
+  height: 100%;
 }
 input,textarea{
   font-family: 'Avenir', Helvetica, Arial, sans-serif;

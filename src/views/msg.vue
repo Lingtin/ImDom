@@ -9,54 +9,21 @@
      </div>
 
      <div class='msg-centent'>
-        <div class='meg-send'>
+       <template v-for='item in data.list'>
+         <div class='meg-send' v-if='item.my_user_id == msg.my_user_id'>
             <div class='msg-imghead'></div>
             <div class='msg-messagecon'>
-              你好啊
+              &nbsp;{{item.message}}
             </div>
         </div>
 
-        <div class='msg-received'>
+        <div class='msg-received' v-else>
             <div class='msg-imghead'></div>
             <div class='msg-messagecon'>
-              hello 美琪
+              &nbsp;{{item.message}}
             </div>
         </div>
-
-        <div class='msg-received'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-             *  从联系人列表入口进入：带入双方用户信息，如果有未读消息，则进入后查询一页聊天记录(10条)，并反馈消息为已读
-            </div>
-        </div>
-
-        <div class='msg-received'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-             *  从联系人列表入口进入：带入双方用户信息，如果有未读消息，则进入后查询一页聊天记录(10条)，并反馈消息为已读
-            </div>
-        </div>
-
-        <div class='msg-received'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-             *  从联系人列表入口进入：带入双方用户信息，如果有未读消息，则进入后查询一页聊天记录(10条)，并反馈消息为已读
-            </div>
-        </div>
-
-        <div class='msg-received'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-             *  从联系人列表入口进入：带入双方用户信息，如果有未读消息，则进入后查询一页聊天记录(10条)，并反馈消息为已读
-            </div>
-        </div>
-
-        <div class='msg-received'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-             *  从联系人列表入口进入：带入双方用户信息，如果有未读消息，则进入后查询一页聊天记录(10条)，并反馈消息为已读
-            </div>
-        </div>
+       </template>
      </div>
 
      <div class='msg-sendarea'>
@@ -65,10 +32,10 @@
         </div>
         <div class='msg-sendmsg'>
           <div class='msg-input'>
-            <textarea class='msg-area'></textarea>
+            <textarea class='msg-area' v-model='msg.message'></textarea>
           </div>
           <div class='msg-sendbtn'>
-            <button class='msg-btn'>发送</button>
+            <button class='msg-btn' @click="sendMessage">发送</button>
           </div>
         </div>
      </div>
@@ -76,19 +43,44 @@
 </template>
 
 <script>
+import {mapState} from 'vuex';
+import {apiUrl,selectChatLogsList} from '@/api/api.js';
+
 export default {
   name:"msg",
   data(){
     return {
-
+      msg:{
+        my_user_id: "",
+        to_user_id: "",
+        message: ""
+      },
+      pageNum:1,
+      data:{}
     }
   },
+  computed:{...mapState(["userids","stompClient"])},
   mounted(){
+    this.msg.my_user_id = this.userids.user_id;
+    this.msg.to_user_id = this.$route.query.to_user_id;
+    this.selectChatLogs();
 
+    this.stompClient.subscribe(apiUrl+'/user/chat/tomessage',function (response) {
+          console.log(response.body)
+    });
   },
   methods:{
     sendMessage(){
-      
+      console.log(this.msg)
+      this.stompClient.send(apiUrl+"/chat/inmessage",{},JSON.stringify(this.msg));
+    },
+    selectChatLogs(){
+      this.msg.pageNum = this.pageNum;
+      selectChatLogsList(this.msg).then((data) => {
+        if (data.success) {
+          this.data = data.data;
+        }
+      })
     }
   }
 }
@@ -128,7 +120,7 @@ $HEAD_H:40px;
 
 .msg-centent{
   width: 100%;
-  height: calc(500px - 100px);
+  height: calc(100vh - 40px);
   overflow-y:auto;
   overflow-x: hidden;
   .meg-send{
@@ -246,6 +238,9 @@ $HEAD_H:40px;
   background: rgb(233, 232, 232);
   font-size: 12px;
   padding: 6px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
   .msg-nav{
     width: 100%;
     height: 20px;
