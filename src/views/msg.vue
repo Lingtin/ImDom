@@ -4,7 +4,7 @@
        <div class='msg-headeimg'>
          <!-- <div class='msg-imgbox'></div> -->
        </div>
-       <div class='msg-title'>对方昵称</div>
+       <div class='msg-title'>{{msg.to_user_id}} [{{msg.to_is_online == 0?:"离线":"在线"}}]</div>
        <div></div>
      </div>
 
@@ -19,7 +19,7 @@
         <div class='msg-received' v-else>
             <div class='msg-imghead'></div>
             <div class='msg-messagecon'>
-              &nbsp;{{item.message}}
+              {{item.message}}&nbsp;
             </div>
         </div>
        </template>
@@ -31,7 +31,7 @@
         </div>
         <div class='msg-sendmsg'>
           <div class='msg-input'>
-            <textarea class='msg-area' v-model='msg.message'></textarea>
+            <textarea class='msg-area' v-model='msg.message' wrap="hard"></textarea>
           </div>
           <div class='msg-sendbtn'>
             <button class='msg-btn' @click="sendMessage">发送</button>
@@ -55,30 +55,43 @@ export default {
         message: ""
       },
       pageNum:1,
-      data:{}
+      data:{
+        list:[]
+      },
+      disableded:true
     }
   },
   computed:{...mapState(["userids","stompClient"])},
+  watch:{
+    "msg.message"(val){
+      this.disableded=Boolean(val)
+    }
+  },
   mounted(){
+    this.msg = this.$route.query;
     this.msg.my_user_id = this.userids.user_id;
-    this.msg.to_user_id = this.$route.query.to_user_id;
     this.selectChatLogs();
-
-    // this.stompClient.subscribe(apiUrl+'/user/chat/tomessage',function (response) {
-    //       console.log(response.body)
-    // });
   },
   methods:{
     sendMessage(){
-      console.log(this.msg)
-      this.stompClient.send(apiUrl+"/chat/inmessage",{},JSON.stringify(this.msg));
-      this.selectChatLogs()
+      this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
+      // this.stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
+      //   console.log(response)
+      // });
+      this.data.list.push({
+				"chat_time":1532682200000,
+				"is_read":0,
+				"logs_id":"fc710088f7224edebd70b285ce8faf58",
+				"message":this.msg.message,
+				"my_user_id":this.msg.my_user_id,
+				"to_user_id":this.msg.to_user_id
+      })
     },
     selectChatLogs(){
       this.msg.pageNum = this.pageNum;
       selectChatLogsList(this.msg).then((data) => {
         if (data.success) {
-          data.data.list=data.data.list.reverse();
+          data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
           this.data = data.data;
         }
       })
@@ -144,7 +157,7 @@ $HEAD_H:40px;
     .msg-messagecon{
       border: 1px solid #ddd;
       max-width: 200px;
-      min-width: 40px;
+      min-width: 4px;
       float: right;
       // height: 24px;
       margin: 8px 0;
@@ -153,7 +166,7 @@ $HEAD_H:40px;
       line-height: 18px;
       color: #333;
       word-wrap: break-word;
-      padding: 4px 2px 4px 6px;
+      padding: 4px 8px 4px 6px;
       position: relative;
   //     border-top: 90px solid transparent;
   // border-right: 100px solid black;
@@ -310,4 +323,18 @@ $HEAD_H:40px;
   
 }
 
+
+.msg-input{
+  ::-webkit-scrollbar {
+      width: 2px;
+      height: 2px;
+      background-color: #ddd;
+      border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+      background-color: #777;
+      border-radius: 2px;
+  }
+}
 </style>

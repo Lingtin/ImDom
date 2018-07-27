@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,7 +35,7 @@
 
 <script type="text/javascript">
     var stompClient = null;
-    var host = "http://localhost";
+    var host = "";
     // var host = "http://127.0.0.1:10005";
     // var host = "https://api.ximiyun.cn";
 
@@ -58,17 +57,6 @@
                     var socket = new SockJS(host+'/chat/init');
                     //使用STOMP子协议的WebSocket客户端
                     stompClient = Stomp.over(socket);
-
-
-                    $.ajax({
-                            type:"post",
-                            url:host+"/chat/user/selectChatRelationList",
-                            data:{user_id:json.data.user_id},
-                            success:function (respons) {
-                                console.log(respons);
-                            },
-                            async:false}
-                    )
                 }else{
                     alert(json.msg)
                 }

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 
-export const apiUrl = "http://localhost";
+export const apiUrl = "";
 // https://chat.ximiyun.cn
 // axios.create({
 //     baseURL: '',

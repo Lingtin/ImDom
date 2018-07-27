@@ -9,11 +9,16 @@
 <script>
 export default {
   created(){
-    this.$store.dispatch('init');
+    var reg = new RegExp("(^|&)"+"my_user_id=([^&]*)(&|$)");
+     var r = window.location.hash.substr(1).match(reg);
+    if(r){
+      this.$store.dispatch('init',r);
+    }else{
+      this.$store.dispatch('init',"u2");
+    }
   }
 }
 </script>
-
 
 <style lang="scss">
 #app {

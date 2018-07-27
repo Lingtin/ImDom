@@ -8,39 +8,50 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  getters:{
+    userList:(state)=>state.userList
+  },
   state: {
     userids:{},
     stompClient:{},
     userInfo:{},
-    userList:{}
+    userList:{},
+    bodymsg:{}
   },
   mutations: {
     addUserIds(state,info){
       state.userids = info;
+    },
+    addstompClient(state,stompClient){
+      state.stompClient = stompClient;
     }
   },
   actions: {
-    init({state,commit,dispatch}){
-          Login({token:'u2'}).then(({data,success}) => {
+    init({state,commit,dispatch},searchId){
+      console.log(searchId)
+          Login({token:searchId}).then(({data,success}) => {
+            console.log(success)
               if (success) {
-                // commit("addUserIds",data)
-                  var socket = new SockJS(`${apiUrl}/chat/init`);
-                  state.userids = data;
+                  commit("addUserIds",data)
                   dispatch("selUserInfo");
+                  var stompClient=null;
+                  var socket = new SockJS(`${apiUrl}/chat/init`);
                   //使用STOMP子协议的WebSocket客户端
-                  state.stompClient = Stomp.over(socket);
-                  state.stompClient.reconnect_delay = 5000;
-                  state.stompClient.connect({},function (frame) {
-                      //通过stompClient.subscribe订阅/topic/getResponse目标发送的消息，即控制器中的@SendTo
+                  stompClient = Stomp.over(socket);
+                  stompClient.connect({},function (frame) {
+                    // console.log("连接成功")
+                    stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
+                      var Body = JSON.parse(response.body);
+                      
+                      state.userList.to_user_id
+                      if (Body.to_user_id) {
+                        
+                      }
+                    });
                   });
-
-                  state.stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
-                    console.log(response)
-                });
+                  commit("addstompClient",stompClient)
               };
-          }).catch((err)=>{
-              console.log(err);
-          })
+          });
     },
     selUserInfo({state,commit,dispatch}){ // 获取用户信息
       selectUserInfo({user_id:state.userids.user_id}).then((data) => {
@@ -50,6 +61,7 @@ export default new Vuex.Store({
       });
     },
     selectChatList({state,commit}){ // 获取联系人列表
+      
       selectChatRelationList({user_id:state.userids.user_id}).then((data) => {
         if (data.success) {
           state.userList = data.data

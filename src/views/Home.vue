@@ -4,7 +4,7 @@
        <div class='home-headeimg'>
          <div class='home-imgbox'></div>
        </div>
-       <div class='home-title'>title</div>
+       <div class='home-title'>{{userids.my_user_id}}</div>
        <div></div>
      </div>
      <div class='home-list'>
@@ -43,7 +43,8 @@ export default {
     [PullRefresh.name]:PullRefresh
   },
   mounted(){
-    
+    // 查询联系人列表
+    this.$store.dispatch("selectChatList");
   },
   computed:{...mapState(["userids","userList"])},
   methods:{
