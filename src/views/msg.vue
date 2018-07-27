@@ -16,7 +16,6 @@
               &nbsp;{{item.message}}
             </div>
         </div>
-
         <div class='msg-received' v-else>
             <div class='msg-imghead'></div>
             <div class='msg-messagecon'>
@@ -65,19 +64,21 @@ export default {
     this.msg.to_user_id = this.$route.query.to_user_id;
     this.selectChatLogs();
 
-    this.stompClient.subscribe(apiUrl+'/user/chat/tomessage',function (response) {
-          console.log(response.body)
-    });
+    // this.stompClient.subscribe(apiUrl+'/user/chat/tomessage',function (response) {
+    //       console.log(response.body)
+    // });
   },
   methods:{
     sendMessage(){
       console.log(this.msg)
       this.stompClient.send(apiUrl+"/chat/inmessage",{},JSON.stringify(this.msg));
+      this.selectChatLogs()
     },
     selectChatLogs(){
       this.msg.pageNum = this.pageNum;
       selectChatLogsList(this.msg).then((data) => {
         if (data.success) {
+          data.data.list=data.data.list.reverse();
           this.data = data.data;
         }
       })
@@ -96,6 +97,9 @@ $HEAD_H:40px;
   background: #3EA5FF;
   text-align: center;
   line-height: $HEAD_H;
+  display: flex;
+  top:0;
+  left: 0;
   >div{
     float: left;
   }

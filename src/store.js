@@ -21,7 +21,7 @@ export default new Vuex.Store({
   },
   actions: {
     init({state,commit,dispatch}){
-          Login({token:'u1'}).then(({data,success}) => {
+          Login({token:'u2'}).then(({data,success}) => {
               if (success) {
                 // commit("addUserIds",data)
                   var socket = new SockJS(`${apiUrl}/chat/init`);
@@ -30,16 +30,13 @@ export default new Vuex.Store({
                   //使用STOMP子协议的WebSocket客户端
                   state.stompClient = Stomp.over(socket);
                   state.stompClient.reconnect_delay = 5000;
-                  state.stompClient.connect({
-                      Upgrade:"$http_upgrade",
-                      Connection:"upgrade"
-                  },function (frame) {
-                      // setConnected(true);
+                  state.stompClient.connect({},function (frame) {
                       //通过stompClient.subscribe订阅/topic/getResponse目标发送的消息，即控制器中的@SendTo
-                      state.stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
-                          showResponse(JSON.parse(response.body));
-                      });
                   });
+
+                  state.stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
+                    console.log(response)
+                });
               };
           }).catch((err)=>{
               console.log(err);
