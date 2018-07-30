@@ -1,12 +1,10 @@
 <template>
   <div class="msg">
-    <div class='msg-header'>
-       <div class='msg-headeimg'>
-         <!-- <div class='msg-imgbox'></div> -->
-       </div>
-       <div class='msg-title'>{{msg.to_user_id}} [{{msg.to_is_online == 0?:"离线":"在线"}}]</div>
-       <div></div>
-     </div>
+    <van-nav-bar class='msg-header'
+      :title="title" :fixed="true"
+      left-text="返回" :z-index="100"
+      left-arrow @click-left="back"
+    />
 
      <div class='msg-centent'>
        <template v-for='item in data.list'>
@@ -42,7 +40,7 @@
 </template>
 
 <script>
-import {mapState} from 'vuex';
+import {mapState,mapGetters} from 'vuex';
 import {apiUrl,selectChatLogsList} from '@/api/api.js';
 
 export default {
@@ -61,10 +59,29 @@ export default {
       disableded:true
     }
   },
-  computed:{...mapState(["userids","stompClient"])},
+  computed:{
+    ...mapState(["userids","stompClient"]),
+    ...mapGetters(["newMsg"]),
+    title(){
+      return this.msg.to_user_id+'['+(this.msg.to_is_online == 0?'离线':'在线')+']';
+    }
+  },
   watch:{
     "msg.message"(val){
       this.disableded=Boolean(val)
+    },
+    newMsg(Body){
+      if (Body.to_user_id == this.msg.to_user_id) {
+        var msg = {
+          "chat_time":Body.chat_time,
+          "is_read":0,
+          "logs_id":"b6d046cd27844786b5c5e6fe751e6e55",
+          "message":Body.message,
+          "my_user_id":Body.to_user_id,
+          "to_user_id":"u2"
+        };
+        this.data.list.push(msg);
+      };
     }
   },
   mounted(){
@@ -95,14 +112,26 @@ export default {
           this.data = data.data;
         }
       })
+    },
+    back(){
+      this.$router.back();
     }
   }
 }
 </script>
 
+<style>
+  .van-nav-bar__text:active{
+    background: #3EA5FF;
+  }
+  .van-nav-bar .van-icon,.van-nav-bar__text{
+    color: #fff;
+  }
+
+</style>
 
 <style lang="scss" scoped>
-$HEAD_H:40px;
+$HEAD_H:46px;
 
 .msg-header{
   width: 100%;
@@ -110,41 +139,21 @@ $HEAD_H:40px;
   background: #3EA5FF;
   text-align: center;
   line-height: $HEAD_H;
-  display: flex;
-  top:0;
-  left: 0;
-  >div{
-    float: left;
-  }
-  .msg-imgbox{
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: inline-block;
-    vertical-align: -9px;
-  }
-  .msg-headeimg{
-    width: 18%;
-    height: 100%;
-  }
-  .msg-title{
-    color: #fff;
-    width: 60%;
-    height: 100%;
-    font-size:16px;
-  }
+  color: #fff;
+  outline: none;
+  
 }
 
 .msg-centent{
   width: 100%;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 46px);
   overflow-y:auto;
   overflow-x: hidden;
   .meg-send{
     width: 100%;
     clear: both;
     overflow: hidden;
-    line-height: 40px;
+    line-height: 46px;
     .msg-imghead{
       width: 30px;
       height: 30px;
@@ -162,7 +171,7 @@ $HEAD_H:40px;
       // height: 24px;
       margin: 8px 0;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 18px;
       color: #333;
       word-wrap: break-word;
@@ -197,7 +206,7 @@ $HEAD_H:40px;
   .msg-received{
     width: 100%;
     overflow: hidden;
-    line-height: 40px;
+    line-height: 46px;
     clear: both;
     .msg-imghead{
       width: 30px;
@@ -210,12 +219,12 @@ $HEAD_H:40px;
     .msg-messagecon{
       border: 1px solid #ddd;
       max-width: 200px;
-      min-width: 40px;
+      min-width: 46px;
       float: left;
       // height: 24px;
       margin: 8px 0;
       border-radius: 4px;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 18px;
       color: #333;
       word-wrap: break-word;
@@ -253,7 +262,7 @@ $HEAD_H:40px;
   overflow: hidden;
   border-top: 1px solid #ddd;
   background: rgb(233, 232, 232);
-  font-size: 12px;
+  font-size: 14px;
   padding: 6px;
   position: fixed;
   bottom: 0;
@@ -264,18 +273,18 @@ $HEAD_H:40px;
     line-height: 20px;
     >div{
       display: inline-block;
-      font-size: 12px;
+      font-size: 14px;
       color: #666;
       cursor: pointer;
     }
     .msg-plugkuai{
-      font-size: 12px;
+      font-size: 14px;
       color: #666;
     }
   }
   .msg-sendmsg{
     width: 100%;
-    height: 40px;
+    height: 46px;
     margin-top:4px; 
 
     $wi:80px;
@@ -283,7 +292,7 @@ $HEAD_H:40px;
       width: calc(100% - 80px);
       float: left;
       .msg-area{
-        font-size: 12px;
+        font-size: 14px;
         width: 100%;
         height: 24px;
         border: none;

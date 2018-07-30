@@ -9,10 +9,11 @@
 <script>
 export default {
   created(){
-    var reg = new RegExp("(^|&)"+"my_user_id=([^&]*)(&|$)");
-     var r = window.location.hash.substr(1).match(reg);
+    var reg = new RegExp("(^|&)my_user_id=([^&]*)(&|$)");
+     var r = window.location.href.substr(2).match(reg);
+     console.log(r)
     if(r){
-      this.$store.dispatch('init',r);
+      this.$store.dispatch('init',unescape(r[2]));
     }else{
       this.$store.dispatch('init',"u2");
     }

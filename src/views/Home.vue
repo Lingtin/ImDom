@@ -50,9 +50,9 @@ export default {
   methods:{
     onRefresh() {
       setTimeout(() => {
+        this.$store.dispatch("selectChatList");
         this.$toast('刷新成功');
         this.isLoading = false;
-        this.count++;
       }, 500);
     },
     onchatname(item){
@@ -63,7 +63,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-$HEAD_H:40px;
+$HEAD_H:46px;
 
 .home-header{
   width: 100%;
@@ -101,7 +101,7 @@ $HEAD_H:40px;
   // background: #f5f5f5;
   width: 100%;
   color: #333;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 46px);
   overflow-y:auto;
   .home-item{
     height: 50px;
@@ -115,7 +115,7 @@ $HEAD_H:40px;
       background: #F5F5F5;
     }
     .img-header{
-      // width: 40px;
+      // width: 46px;
       height: 100%;
       display: inline-block;
       margin: 0 10px;

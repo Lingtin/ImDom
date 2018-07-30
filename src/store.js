@@ -2,21 +2,25 @@ import { Login, apiUrl, selectChatRelationList, selectUserInfo } from '@/api/api
 
 import SockJS from 'sockjs-client'
 import Stomp from '@stomp/stompjs';
+import { Toast } from 'vant';
 import Vue from 'vue'
 import Vuex from 'vuex'
 
+Vue.use(Toast);
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   getters:{
-    userList:(state)=>state.userList
+    userList:(state)=>state.userList,
+    newMsg:(state)=>state.newMsg
   },
   state: {
     userids:{},
     stompClient:{},
     userInfo:{},
     userList:{},
-    bodymsg:{}
+    bodymsg:{},
+    newMsg:{}
   },
   mutations: {
     addUserIds(state,info){
@@ -28,9 +32,14 @@ export default new Vuex.Store({
   },
   actions: {
     init({state,commit,dispatch},searchId){
-      console.log(searchId)
+          Toast.loading({
+            duration: 0,       // 持续展示 toast
+            forbidClick: true, // 禁用背景点击
+            loadingType: 'spinner',
+            message: '加载中'
+          });
+
           Login({token:searchId}).then(({data,success}) => {
-            console.log(success)
               if (success) {
                   commit("addUserIds",data)
                   dispatch("selUserInfo");
@@ -42,11 +51,14 @@ export default new Vuex.Store({
                     // console.log("连接成功")
                     stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
                       var Body = JSON.parse(response.body);
-                      
-                      state.userList.to_user_id
-                      if (Body.to_user_id) {
-                        
-                      }
+                      state.newMsg=Body;
+                      state.userList.map((item)=>{
+                        if (Body.to_user_id == item.to_user_id) {
+                          item.to_user_id = Body.to_user_id;
+                          item.add_time = Body.chat_time;
+                          item.finally_chat_message = Body.message;
+                        };
+                      });
                     });
                   });
                   commit("addstompClient",stompClient)
@@ -61,10 +73,10 @@ export default new Vuex.Store({
       });
     },
     selectChatList({state,commit}){ // 获取联系人列表
-      
       selectChatRelationList({user_id:state.userids.user_id}).then((data) => {
         if (data.success) {
-          state.userList = data.data
+          state.userList = data.data;
+          Toast.clear()
         }
       })
     }
