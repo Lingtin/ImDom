@@ -14,6 +14,7 @@
               &nbsp;{{item.message}}
             </div>
         </div>
+        
         <div class='msg-received' v-else>
             <div class='msg-imghead'></div>
             <div class='msg-messagecon'>

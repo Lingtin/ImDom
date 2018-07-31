@@ -1,4 +1,5 @@
 import 'vant/lib/vant-css/index.css';
+import 'vant-doc/src/helper/touch-simulator';
 
 import App from './App.vue'
 import Vant from 'vant';

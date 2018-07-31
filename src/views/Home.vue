@@ -8,7 +8,28 @@
        <div></div>
      </div>
      <div class='home-list'>
-       <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
+       <van-pull-refresh v-model="isLoading" @refresh="onRefresh" style="min-height:60vh;">
+         <p v-if="userList.length!=0" style='text-align:center;font-size:14px;'>
+           暂无消息,下拉刷新试试。
+          </p>
+          <div class='home-item'>
+            <van-cell-swipe :right-width="65">
+              <van-cell-group>
+                <div class="img-header">
+                  <div class='img-default'></div>
+                  <!-- <img src="" class="img-header"> -->
+                </div>
+                <div class='home-cent'>
+                  <div class='home-nickname'>mingzi</div>
+                  <div class='home-message'>消息</div>
+                </div>
+                <div class='home-time'>09:00</div>
+              </van-cell-group>
+              <span slot="right">
+                <span class='delclass'>删除</span></span>
+            </van-cell-swipe>
+          </div>
+
             <div class='home-item' v-for='item in userList'>
               <div class="img-header">
                 <div class='img-default'></div>
@@ -20,7 +41,8 @@
               </div>
               <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
             </div>
-            </van-pull-refresh>
+        </van-pull-refresh>
+        
      </div>
   </div>
 </template>
@@ -95,7 +117,21 @@ $HEAD_H:46px;
   }
 }
 
+.van-cell-swipe{
+  height: 50px;
+}
 
+.delclass{
+  display: inline-block;
+  // margin: 20px 20px;
+  background: #ff4848;
+  width: 65px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+}
 
 .home-list{
   // background: #f5f5f5;
@@ -132,17 +168,17 @@ $HEAD_H:46px;
       display: inline-block;
       .home-nickname{
         line-height: 26px;
-        font-size: 12px;
+        font-size: 14px;
         width: 200px;
         overflow:hidden;
         text-overflow:ellipsis;
         white-space:nowrap;
       }
       .home-message{
-        font-size: 12px;
+        font-size: 14px;
         line-height: 18px;
         transform:scale(0.90,0.90);
-        margin-left:-12px;
+        margin-left:-10px;
         width: 220px;
         color: #777;
         overflow:hidden;
@@ -153,7 +189,7 @@ $HEAD_H:46px;
     .home-time{
       display: inline-block;
       line-height: 20px;
-      font-size:12px;
+      font-size:14px;
       vertical-align: top;
       margin-top:4px;
       color: #A59999; 

@@ -1,115 +1,31 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1.0, user-scalable=0">
+    <meta name="description" content="Free Web Based iPhone Web2.0 Application Simulator for Safari" />
+    <meta name="keywords" content="iphone, simulator, tester, safari, web2.0, development, browser, debugging, tool, software, free"
+    />
+    <link rel="stylesheet" href="">
 </head>
-<body>
-<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/sockjs-client/1.1.4/sockjs.min.js"></script>
-<script src="https://cdn.bootcss.com/stomp.js/2.3.3/stomp.js"></script>
 
+<body ontouchstart>
+    <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
 
-<body onload="disconnect()">
-<div>
-    <div>
-        <label>我的id</label>
-        <input type="text" id="name"/>
-        <button id="connect" onclick="connect();">登录</button>
-        <button id="disconnect" disabled="disabled" onclick="disconnect();">断开连接</button>
-    </div>
+    <iframe src="index.html" scrolling="yes" width="320" height="520"></iframe>
+    <iframe src="https://youzan.github.io/vant/mobile.html#/zh-CN/cell-swipe?rand=1533004603076" seamless width="320" height="520"></iframe>
 
-    <div id="conversationDIV">
-        </br>
-        <textarea id="content" role="3"></textarea>
-        </br>
-        <label>发送给</label>
-        <input type="text" id="toname"/>
-        </br>
-        <button id="sendName" onclick="sendName();">发送</button>
-        <p id="response"></p>
-    </div>
-
-</div>
-
-<script type="text/javascript">
-    var stompClient = null;
-    var host = "";
-    // var host = "http://127.0.0.1:10005";
-    // var host = "https://api.ximiyun.cn";
-
-    function setConnected(connected){
-        document.getElementById('connect').disabled = connected;
-        document.getElementById('disconnect').disabled = !connected;
-        document.getElementById('conversationDIV').style.visibility = connected ? 'visible':'hidden';
-    }
-
-    function connect(){
-        var name = $("#name").val();
-        $.ajax({
-            url:host+"/chat/user/login",
-            data:{token:name},
-            success:function (json) {
-                if(json.success==1){
-                    alert("登录成功");
-                    //链接Socket的endpoint名称为endpointWisely
-                    var socket = new SockJS(host+'/chat/init');
-                    //使用STOMP子协议的WebSocket客户端
-                    stompClient = Stomp.over(socket);
-                }else{
-                    alert(json.msg)
-                }
-
-
-            },
-            async:false}
-    )
-
-
-        //链接WebSocket服务端
-        stompClient.connect({},function (frame) {
-            setConnected(true);
-            //通过stompClient.subscribe订阅/topic/getResponse目标发送的消息，即控制器中的@SendTo
-            stompClient.subscribe(host+'/user/chat/tomessage',function (response) {
-                showResponse(JSON.parse(response.body));
-            });
-        });
-    }
-
-    function disconnect(){
-        if(stompClient != null){
-            stompClient.disconnect();
-        }
-        setConnected(false);
-        console.log("Disconnecteed");
-    }
-
-    function sendName(){
-        var name = $("#name").val();
-        var toname = $('#toname').val();
-        var content = $("#content").val();
-        var message = {
-            my_user_id: name,
-            to_user_id: toname,
-            message: content
-        };
-        $('#response').append(
-            $('#response').val() +
-            '我: '+
-            content + '<br/>');
-        stompClient.send(host+"/chat/inmessage",{},JSON.stringify(message));
-    }
-
-    function showResponse(message){
-        $('#response').append(
-            $('#response').val() +
-            message.to_user_id+': '+
-            message.message + '<br/>');
-    }
-
-</script>
-
-
+    
 </body>
+
 </html>
