@@ -9,38 +9,27 @@
      </div>
      <div class='home-list'>
        <van-pull-refresh v-model="isLoading" @refresh="onRefresh" style="min-height:60vh;">
-         <p v-if="userList.length!=0" style='text-align:center;font-size:14px;'>
+         <p v-if="userList.length==0" style='text-align:center;font-size:14px;'>
            暂无消息,下拉刷新试试。
           </p>
-          <div class='home-item'>
-            <van-cell-swipe :right-width="65">
-              <van-cell-group>
+          <div class='home-item' v-for='item in userList'>
+            <van-cell-swipe :right-width="130">
+              <van-cell-group @click="onchatname(item)">
                 <div class="img-header">
                   <div class='img-default'></div>
                   <!-- <img src="" class="img-header"> -->
                 </div>
                 <div class='home-cent'>
-                  <div class='home-nickname'>mingzi</div>
-                  <div class='home-message'>消息</div>
+                  <div class='home-nickname'>{{item.to_nick_name}}</div>
+                  <div class='home-message'>{{item.finally_chat_message}}</div>
                 </div>
-                <div class='home-time'>09:00</div>
+                <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
               </van-cell-group>
               <span slot="right">
+                <span class='delclass'>修改备注</span></span>
                 <span class='delclass'>删除</span></span>
             </van-cell-swipe>
           </div>
-
-            <div class='home-item' v-for='item in userList'>
-              <div class="img-header">
-                <div class='img-default'></div>
-                <!-- <img src="" class="img-header"> -->
-              </div>
-              <div class='home-cent' @click="onchatname(item)">
-                <div class='home-nickname'>{{item.to_nick_name}}</div>
-                <div class='home-message'>{{item.finally_chat_message}}</div>
-              </div>
-              <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
-            </div>
         </van-pull-refresh>
         
      </div>
