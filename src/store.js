@@ -32,12 +32,12 @@ export default new Vuex.Store({
   },
   actions: {
     init({state,commit,dispatch},searchId){
-          // Toast.loading({
-          //   duration: 0,       // 持续展示 toast
-          //   forbidClick: true, // 禁用背景点击
-          //   loadingType: 'spinner',
-          //   message: '加载中'
-          // });
+          Toast.loading({
+            duration: 0,       // 持续展示 toast
+            forbidClick: true, // 禁用背景点击
+            loadingType: 'spinner',
+            message: '加载中'
+          });
 
           Login({token:searchId}).then(({data,success}) => {
               if (success) {
