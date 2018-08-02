@@ -38,6 +38,10 @@ export const delectChatRelation = (parmes) =>{return axios.post(`${apiUrl}/chat/
  * @name 查询聊天记录 ${apiUrl}/chat/user/selectChatLogsList
  */
 export const selectChatLogsList = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectChatLogsList`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
+/**
+ * @name 修改联系人备注 ${apiUrl}/chat/user/updateChatRelationToUserRemark
+ */
+export const updateChatRelationToUserRemark = (parmes) =>{return axios.post(`${apiUrl}/chat/user/updateChatRelationToUserRemark`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
 
 /**
  * @name 连接socket ${apiUrl}/chat/init

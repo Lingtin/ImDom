@@ -14,20 +14,23 @@
           </p>
           <div class='home-item' v-for='item in userList'>
             <van-cell-swipe :right-width="130">
-              <van-cell-group @click="onchatname(item)">
+              <van-cell-group>
                 <div class="img-header">
-                  <div class='img-default'></div>
-                  <!-- <img src="" class="img-header"> -->
+                  <img :src="'https://image.ximiyun.cn'+item.to_user_face" v-if='item.to_user_face'>
+                  <div class='img-default' v-else></div>
                 </div>
-                <div class='home-cent'>
-                  <div class='home-nickname'>{{item.to_nick_name}}</div>
-                  <div class='home-message'>{{item.finally_chat_message}}</div>
+                <div class='home-cent' @click="onchatname(item)">
+                  <div class='home-nickname'>{{item.to_user_remark?item.to_user_remark:item.to_user_id}}</div>
+                  <div class='home-message'>
+                    {{item.finally_chat_message?item.finally_chat_message:item.to_is_online}}
+                  </div>
                 </div>
                 <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
               </van-cell-group>
               <span slot="right">
-                <span class='delclass'>修改备注</span></span>
-                <span class='delclass'>删除</span></span>
+                <span class='editclass'>修改备注</span>
+                <span class='delclass' @click="delectRelation">删除</span>
+              </span>
             </van-cell-swipe>
           </div>
         </van-pull-refresh>
@@ -39,7 +42,8 @@
 <script>
 import {mapState,mapMutations} from 'vuex';
 import { PullRefresh  } from 'vant';
-import {selectChatRelationList} from '@/api/api.js';
+import {selectChatRelationList,delectChatRelation} from '@/api/api.js';
+import { Dialog } from 'vant';
 
 export default {
   name: 'home',
@@ -68,6 +72,22 @@ export default {
     },
     onchatname(item){
       this.$router.push({path:"msg",query:item})
+    },
+    delectRelation(){
+       Dialog.confirm({
+          title: '标题',
+          message: '弹窗内容'
+        }).then(() => {
+          // on confirm
+        }).catch(() => {
+          // on cancel
+        });
+        return;
+      delectChatRelation().then((data) => {
+        if (data.success) {
+          this.$toast('删除成功');
+        }
+      })
     }
   }
 }
@@ -110,6 +130,18 @@ $HEAD_H:46px;
   height: 50px;
 }
 
+.editclass{
+  display: inline-block;
+  // margin: 20px 20px;
+  background: #fd9e5e;
+  width: 65px;
+  height: 50px;
+  line-height: 50px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
+}
+
 .delclass{
   display: inline-block;
   // margin: 20px 20px;
@@ -144,12 +176,18 @@ $HEAD_H:46px;
       height: 100%;
       display: inline-block;
       margin: 0 10px;
+      >img{
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        vertical-align: 2px;
+      }
       .img-default{
         width: 32px;
         height: 32px;
         background: #d1d1d1;
         border-radius:50%; 
-        vertical-align: 4px;
+        // vertical-align: 4px;
         display: inline-block;
       }
     }
