@@ -38,7 +38,6 @@ export default new Vuex.Store({
             loadingType: 'spinner',
             message: '加载中'
           });
-
           Login({token:searchId}).then(({data,success}) => {
               if (success) {
                   commit("addUserIds",data)

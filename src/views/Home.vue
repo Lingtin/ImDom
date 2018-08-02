@@ -9,33 +9,40 @@
      </div>
      <div class='home-list'>
        <van-pull-refresh v-model="isLoading" @refresh="onRefresh" style="min-height:60vh;">
-         <p v-if="userList.length==0" style='text-align:center;font-size:14px;'>
-           暂无消息,下拉刷新试试。
-          </p>
-          <div class='home-item' v-for='item in userList'>
-            <van-cell-swipe :right-width="130">
-              <van-cell-group>
-                <div class="img-header">
-                  <img :src="'https://image.ximiyun.cn'+item.to_user_face" v-if='item.to_user_face'>
-                  <div class='img-default' v-else></div>
-                </div>
-                <div class='home-cent' @click="onchatname(item)">
-                  <div class='home-nickname'>{{item.to_user_remark?item.to_user_remark:item.to_user_id}}</div>
-                  <div class='home-message'>
-                    {{item.finally_chat_message?item.finally_chat_message:item.to_is_online}}
+          <div class='Refresh' style='min-height:90vh;'>
+            <p v-if="userList.length==0" style='text-align:center;font-size:14px;'>
+            暂无消息,下拉刷新试试。
+            </p>
+            <div class='home-item' v-for='item in userList'>
+              <van-cell-swipe :right-width="160">
+                <van-cell-group>
+                  <div class="img-header">
+                    <img :src="'https://image.ximiyun.cn'+item.to_user_face" v-if='item.to_user_face'>
+                    <div class='img-default' v-else></div>
                   </div>
-                </div>
-                <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
-              </van-cell-group>
-              <span slot="right">
-                <span class='editclass'>修改备注</span>
-                <span class='delclass' @click="delectRelation">删除</span>
-              </span>
-            </van-cell-swipe>
+                  <div class='home-cent' @click="onchatname(item)">
+                    <div class='home-nickname'>{{item.to_user_remark?item.to_user_remark:item.to_user_id}}</div>
+                    <div class='home-message'>
+                      {{item.finally_chat_message?item.finally_chat_message:item.to_is_online}}
+                    </div>
+                  </div>
+                  <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
+                </van-cell-group>
+                <span slot="right">
+                  <span class='editclass' @click="show=true">修改备注</span>
+                  <span class='delclass' @click="delectRelation(item)">删除</span>
+                </span>
+              </van-cell-swipe>
+            </div>
           </div>
         </van-pull-refresh>
-        
      </div>
+
+    <!-- 修改备注 -->
+     <van-dialog v-model="show" show-cancel-button :before-close="beforeClose">
+        <div class='dialogtitle'>修改备注</div>
+        <van-field v-model="remarkData.to_user_remark" label="备注" placeholder="请输入备注"/>
+      </van-dialog>
   </div>
 </template>
 
@@ -43,7 +50,6 @@
 import {mapState,mapMutations} from 'vuex';
 import { PullRefresh  } from 'vant';
 import {selectChatRelationList,delectChatRelation} from '@/api/api.js';
-import { Dialog } from 'vant';
 
 export default {
   name: 'home',
@@ -51,7 +57,12 @@ export default {
     return {
       count: 0,
       isLoading: false,
-      show:false
+      show:false,
+      username:"",
+      remarkData:{
+          relation_id:"",
+          to_user_remark:""
+      }
     }
   },
   components:{
@@ -63,38 +74,59 @@ export default {
   },
   computed:{...mapState(["userids","userList"])},
   methods:{
-    onRefresh() {
+    onRefresh() {// 下拉刷新
       setTimeout(() => {
         this.$store.dispatch("selectChatList");
         this.$toast('刷新成功');
         this.isLoading = false;
       }, 500);
     },
-    onchatname(item){
+    onchatname(item){ // link 详情
       this.$router.push({path:"msg",query:item})
     },
-    delectRelation(){
-       Dialog.confirm({
-          title: '标题',
-          message: '弹窗内容'
+    delectRelation(item){// 删除联系人
+       this.$dialog.confirm({
+          title: '删除联系人',
+          message: '确定要删除联系人？'
         }).then(() => {
           // on confirm
+           delectChatRelation({relation_id:item.relation_id}).then((data) => {
+              if (data.success) {
+                this.$toast('删除成功');
+              }else{
+                this.$toast(data.msg);
+              }
+            });
         }).catch(() => {
           // on cancel
         });
-        return;
-      delectChatRelation().then((data) => {
-        if (data.success) {
-          this.$toast('删除成功');
-        }
-      })
+    },
+    showdialog(item){
+      this.show=true;
+      this.remarkData={
+        relation_id:item.relation_id,
+        to_user_remark:item.to_user_remark
+      }
+    },
+    beforeClose(action, done) { //修改备注 弹出框关闭
+      if (action === 'confirm') {
+        updateChatRelationToUserRemark().then((data) => {
+          if (data.success) {
+            setTimeout(done, 1000);
+          }else{
+
+          }
+        });
+      } else {
+        done();
+      };
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
-$HEAD_H:46px;
+$HEAD_H:56px;
 
 .home-header{
   width: 100%;
@@ -107,12 +139,12 @@ $HEAD_H:46px;
     float: left;
   }
   .home-imgbox{
-    width: 28px;
-    height: 28px;
+    width: 38px;
+    height: 38px;
     background: green;
     border-radius: 50%;
     display: inline-block;
-    vertical-align: -9px;
+    vertical-align: middle;
   }
   .home-headeimg{
     width: 18%;
@@ -126,44 +158,41 @@ $HEAD_H:46px;
   }
 }
 
-.van-cell-swipe{
-  height: 50px;
+.dialogtitle{
+  font-size: 16px;
+  height:40px;
+  line-height: 48px;
+  vertical-align: bottom;
+  text-align: center;
+}
+
+@mixin delclass{
+  display: inline-block;
+  width: 80px;
+  height: 66px;
+  line-height: 66px;
+  text-align: center;
+  color: #fff;
+  font-size: 14px;
 }
 
 .editclass{
-  display: inline-block;
-  // margin: 20px 20px;
+  @include delclass;
   background: #fd9e5e;
-  width: 65px;
-  height: 50px;
-  line-height: 50px;
-  text-align: center;
-  color: #fff;
-  font-size: 14px;
 }
-
 .delclass{
-  display: inline-block;
-  // margin: 20px 20px;
+  @include delclass;
   background: #ff4848;
-  width: 65px;
-  height: 50px;
-  line-height: 50px;
-  text-align: center;
-  color: #fff;
-  font-size: 14px;
 }
 
 .home-list{
   // background: #f5f5f5;
   width: 100%;
   color: #333;
-  height: calc(100vh - 46px);
+  height: calc(100vh - 56px);
   overflow-y:auto;
   .home-item{
-    height: 50px;
     border-bottom: 1px solid rgb(235, 235, 235);
-    line-height: 43px;
     cursor: pointer;
     &:hover{
       background: #F5F5F5;
@@ -172,30 +201,31 @@ $HEAD_H:46px;
       background: #F5F5F5;
     }
     .img-header{
-      // width: 46px;
+      // width: 56px;
       height: 100%;
       display: inline-block;
       margin: 0 10px;
-      >img{
-        width: 32px;
-        height: 32px;
+      $wid:46px;
+
+      @mixin default{
+        width: $wid;
+        height: $wid;
         border-radius: 50%;
-        vertical-align: 2px;
+      }
+      >img{
+        @include default;
       }
       .img-default{
-        width: 32px;
-        height: 32px;
-        background: #d1d1d1;
-        border-radius:50%; 
-        // vertical-align: 4px;
+        @include default;
         display: inline-block;
       }
     }
     .home-cent{
       display: inline-block;
+      margin: 10px;
       .home-nickname{
-        line-height: 26px;
-        font-size: 14px;
+        line-height: 28px;
+        font-size: 16px;
         width: 200px;
         overflow:hidden;
         text-overflow:ellipsis;
@@ -204,8 +234,6 @@ $HEAD_H:46px;
       .home-message{
         font-size: 14px;
         line-height: 18px;
-        transform:scale(0.90,0.90);
-        margin-left:-10px;
         width: 220px;
         color: #777;
         overflow:hidden;
@@ -215,10 +243,9 @@ $HEAD_H:46px;
     }
     .home-time{
       display: inline-block;
-      line-height: 20px;
+      line-height: 48px;
       font-size:14px;
       vertical-align: top;
-      margin-top:4px;
       color: #A59999; 
     }
   }
