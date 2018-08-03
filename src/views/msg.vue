@@ -5,11 +5,8 @@
       left-text="返回" :z-index="100"
       left-arrow @click-left="back"
     />
-
-    <div class='msg-centent'>
-      <van-pull-refresh v-model="isLoading" @refresh="onRefresh"
-      pulling-text="下拉加载更历史" loosing-text="释放即将加载">
-      <div class='msg-Refresh'>
+      <div class='msg-centent'>
+        <div class='msg-onload'><span @click="onRefresh">加载更多</span></div>
         <template v-for='item in data.list'>
           <div class='meg-send' v-if='item.my_user_id == msg.my_user_id'>
               <div class='msg-imghead'></div>
@@ -25,13 +22,9 @@
               </div>
           </div>
         </template>
-        
       </div>
-      </van-pull-refresh>
-    </div>
-    
 
-     <div class='msg-sendarea'>
+     <!-- <div class='msg-sendarea'>
         <div class='msg-nav'>
           <div class='msg-plugkuai'>快捷短语</div>
         </div>
@@ -43,7 +36,7 @@
             <button class='msg-btn' @click="sendMessage">发送</button>
           </div>
         </div>
-     </div>
+     </div> -->
   </div>
 </template>
 
@@ -72,7 +65,7 @@ export default {
     ...mapState(["userids","stompClient"]),
     ...mapGetters(["newMsg"]),
     title(){
-      return this.msg.to_user_id+'['+(this.msg.to_is_online == 0?'离线':'在线')+']';
+      return this.msg.to_user_id+'-'+(this.msg.to_is_online == 0?'离线':'在线');
     }
   },
   watch:{
@@ -102,9 +95,6 @@ export default {
   methods:{
     sendMessage(){
       this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
-      // this.stompClient.subscribe(`${apiUrl}/user/chat/tomessage`,function (response) {
-      //   console.log(response)
-      // });
       this.data.list.push({
 				"chat_time":1532682200000,
 				"is_read":0,
@@ -169,15 +159,23 @@ $HEAD_H:56px;
 }
 
 .msg-centent{
-  $H:calc(100vh - 150px);
   width: 100%;
   height:100%;
   margin-top:56px; 
   overflow-y:auto;
   overflow-x: hidden;
-  .msg-Refresh{
-    height: $H;
-    width: 100%;
+  .msg-onload{
+    text-align: center;
+    font-size: 16px;
+    >span{
+      cursor: pointer;
+      height: 40px;
+      line-height: 40px;
+      &:hover{
+        color: #3EA5FF;
+      }
+    }
+    
   }
   .meg-send{
     width: 100%;
@@ -289,7 +287,6 @@ $HEAD_H:56px;
 
 .msg-sendarea{
   width: 100%;
-  overflow: hidden;
   border-top: 1px solid #ddd;
   background: rgb(233, 232, 232);
   font-size: 14px;
