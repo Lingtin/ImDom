@@ -6,23 +6,30 @@
       left-arrow @click-left="back"
     />
 
-     <div class='msg-centent'>
-       <template v-for='item in data.list'>
-         <div class='meg-send' v-if='item.my_user_id == msg.my_user_id'>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-              &nbsp;{{item.message}}
-            </div>
-        </div>
+    <div class='msg-centent'>
+      <van-pull-refresh v-model="isLoading" @refresh="onRefresh"
+      pulling-text="下拉加载更历史" loosing-text="释放即将加载">
+      <div class='msg-Refresh'>
+        <template v-for='item in data.list'>
+          <div class='meg-send' v-if='item.my_user_id == msg.my_user_id'>
+              <div class='msg-imghead'></div>
+              <div class='msg-messagecon'>
+                &nbsp;{{item.message}}
+              </div>
+          </div>
+          
+          <div class='msg-received' v-else>
+              <div class='msg-imghead'></div>
+              <div class='msg-messagecon'>
+                {{item.message}}&nbsp;
+              </div>
+          </div>
+        </template>
         
-        <div class='msg-received' v-else>
-            <div class='msg-imghead'></div>
-            <div class='msg-messagecon'>
-              {{item.message}}&nbsp;
-            </div>
-        </div>
-       </template>
-     </div>
+      </div>
+      </van-pull-refresh>
+    </div>
+    
 
      <div class='msg-sendarea'>
         <div class='msg-nav'>
@@ -48,6 +55,7 @@ export default {
   name:"msg",
   data(){
     return {
+      isLoading:false,
       msg:{
         my_user_id: "",
         to_user_id: "",
@@ -88,6 +96,7 @@ export default {
   mounted(){
     this.msg = this.$route.query;
     this.msg.my_user_id = this.userids.user_id;
+    console.log(this.msg)
     this.selectChatLogs();
   },
   methods:{
@@ -106,16 +115,31 @@ export default {
       })
     },
     selectChatLogs(){
-      this.msg.pageNum = this.pageNum;
+      this.msg.pageNum = 1;
       selectChatLogsList(this.msg).then((data) => {
         if (data.success) {
           data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
           this.data = data.data;
         }
-      })
+      });
     },
     back(){
       this.$router.back();
+    },
+    onRefresh(){
+      this.pageNum++
+      this.msg.pageNum = this.pageNum;
+      selectChatLogsList(this.msg).then((data) => {
+        if (data.success) {
+          // data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
+          data.data.list.forEach((item)=>{
+            this.data.list.unshift(item)
+          });
+          this.isLoading = false;
+        }else{
+          this.isLoading = false;
+        }
+      });
     }
   }
 }
@@ -132,7 +156,7 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-$HEAD_H:46px;
+$HEAD_H:56px;
 
 .msg-header{
   width: 100%;
@@ -142,19 +166,24 @@ $HEAD_H:46px;
   line-height: $HEAD_H;
   color: #fff;
   outline: none;
-  
 }
 
 .msg-centent{
+  $H:calc(100vh - 150px);
   width: 100%;
-  height: calc(100vh - 46px);
+  height:100%;
+  margin-top:56px; 
   overflow-y:auto;
   overflow-x: hidden;
+  .msg-Refresh{
+    height: $H;
+    width: 100%;
+  }
   .meg-send{
     width: 100%;
     clear: both;
     overflow: hidden;
-    line-height: 46px;
+    line-height: 56px;
     .msg-imghead{
       width: 30px;
       height: 30px;
@@ -207,7 +236,7 @@ $HEAD_H:46px;
   .msg-received{
     width: 100%;
     overflow: hidden;
-    line-height: 46px;
+    line-height: 56px;
     clear: both;
     .msg-imghead{
       width: 30px;
@@ -220,7 +249,7 @@ $HEAD_H:46px;
     .msg-messagecon{
       border: 1px solid #ddd;
       max-width: 200px;
-      min-width: 46px;
+      min-width: 56px;
       float: left;
       // height: 24px;
       margin: 8px 0;
@@ -285,7 +314,7 @@ $HEAD_H:46px;
   }
   .msg-sendmsg{
     width: 100%;
-    height: 46px;
+    height: 56px;
     margin-top:4px; 
 
     $wi:80px;

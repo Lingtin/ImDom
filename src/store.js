@@ -28,6 +28,9 @@ export default new Vuex.Store({
     },
     addstompClient(state,stompClient){
       state.stompClient = stompClient;
+    },
+    updateRemake(state,info){
+      state.userList[info.index].to_user_remark = info.to_user_remark;
     }
   },
   actions: {

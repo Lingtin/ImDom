@@ -2,9 +2,11 @@
   <div class="home">
      <div class='home-header'>
        <div class='home-headeimg'>
-         <div class='home-imgbox'></div>
+         <div class='home-imgbox'>
+           <img :src="'https://image.ximiyun.cn'+userids.user_face" v-if='userids.user_face'>
+         </div>
        </div>
-       <div class='home-title'>{{userids.my_user_id}}</div>
+       <div class='home-title'>{{userids.nick_name}}</div>
        <div></div>
      </div>
      <div class='home-list'>
@@ -13,7 +15,7 @@
             <p v-if="userList.length==0" style='text-align:center;font-size:14px;'>
             暂无消息,下拉刷新试试。
             </p>
-            <div class='home-item' v-for='item in userList'>
+            <div class='home-item' v-for='(item,index) in userList'>
               <van-cell-swipe :right-width="160">
                 <van-cell-group>
                   <div class="img-header">
@@ -26,10 +28,13 @@
                       {{item.finally_chat_message?item.finally_chat_message:item.to_is_online}}
                     </div>
                   </div>
-                  <div class='home-time'>{{item.finally_chat_time|FileterTime}}</div>
+                  <div class='home-time'>
+                    {{item.finally_chat_time|FileterTime}}
+                    <span class='home_unreadnum' v-if='item.unread_message_number>0'>{{item.unread_message_number}}</span>
+                  </div>
                 </van-cell-group>
                 <span slot="right">
-                  <span class='editclass' @click="show=true">修改备注</span>
+                  <span class='editclass' @click="showdialog(item,index)">修改备注</span>
                   <span class='delclass' @click="delectRelation(item)">删除</span>
                 </span>
               </van-cell-swipe>
@@ -49,7 +54,7 @@
 <script>
 import {mapState,mapMutations} from 'vuex';
 import { PullRefresh  } from 'vant';
-import {selectChatRelationList,delectChatRelation} from '@/api/api.js';
+import {selectChatRelationList,delectChatRelation,updateChatRelationToUserRemark} from '@/api/api.js';
 
 export default {
   name: 'home',
@@ -62,11 +67,9 @@ export default {
       remarkData:{
           relation_id:"",
           to_user_remark:""
-      }
+      },
+      indexds:0
     }
-  },
-  components:{
-    [PullRefresh.name]:PullRefresh
   },
   mounted(){
     // 查询联系人列表
@@ -74,6 +77,7 @@ export default {
   },
   computed:{...mapState(["userids","userList"])},
   methods:{
+    ...mapMutations(["updateRemake"]),
     onRefresh() {// 下拉刷新
       setTimeout(() => {
         this.$store.dispatch("selectChatList");
@@ -101,8 +105,9 @@ export default {
           // on cancel
         });
     },
-    showdialog(item){
+    showdialog(item,index){ // 显示修改备注dialog
       this.show=true;
+      this.indexds=index;
       this.remarkData={
         relation_id:item.relation_id,
         to_user_remark:item.to_user_remark
@@ -110,11 +115,18 @@ export default {
     },
     beforeClose(action, done) { //修改备注 弹出框关闭
       if (action === 'confirm') {
-        updateChatRelationToUserRemark().then((data) => {
+        console.log(this.remarkData)
+        updateChatRelationToUserRemark(this.remarkData).then((data) => {
           if (data.success) {
-            setTimeout(done, 1000);
+            // setTimeout(done, 1000);
+            // this.userList
+            this.updateRemake({
+              index:this.indexds,
+              to_user_remark:this.remarkData.to_user_remark
+            });
+            done();
           }else{
-
+            this.$toast(data.msg)
           }
         });
       } else {
@@ -141,10 +153,15 @@ $HEAD_H:56px;
   .home-imgbox{
     width: 38px;
     height: 38px;
-    background: green;
+    background: #ddd(211, 211, 211);
     border-radius: 50%;
     display: inline-block;
     vertical-align: middle;
+    >img{
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+    }
   }
   .home-headeimg{
     width: 18%;
@@ -218,6 +235,7 @@ $HEAD_H:56px;
       .img-default{
         @include default;
         display: inline-block;
+        background: #3EA5FF;
       }
     }
     .home-cent{
@@ -226,7 +244,7 @@ $HEAD_H:56px;
       .home-nickname{
         line-height: 28px;
         font-size: 16px;
-        width: 200px;
+        width: calc(100vw - 146px);
         overflow:hidden;
         text-overflow:ellipsis;
         white-space:nowrap;
@@ -234,7 +252,7 @@ $HEAD_H:56px;
       .home-message{
         font-size: 14px;
         line-height: 18px;
-        width: 220px;
+        width: calc(100vw - 146px);
         color: #777;
         overflow:hidden;
         text-overflow:ellipsis;
@@ -247,6 +265,21 @@ $HEAD_H:56px;
       font-size:14px;
       vertical-align: top;
       color: #A59999; 
+      position: relative;
+      .home_unreadnum{
+        position: absolute;
+        display: block;
+        left:0px;
+        bottom: -8px;
+        text-align: center;
+        min-width: 30px;
+        height: 18px;
+        line-height: 18px;
+        font-size: 12px;
+        background: #f76666;
+        color: #fff;
+        border-radius: 10px;
+      }
     }
   }
   
