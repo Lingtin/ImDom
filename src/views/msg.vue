@@ -115,9 +115,8 @@ export default {
     this.selectChatLogs();
     window.scrollTo(0,document.body.scrollHeight)
     var msgCentent = document.getElementById("msgcentent");
-    msgCentent.scrollTop = msgCentent.scrollHeight
-    console.log(msgCentent.scrollTop)
-     console.log(msgCentent.offsetHeight)
+    window.scrollY = window.innerHeight;
+    // screenTop
   },
   methods:{
     sendMessage(){
