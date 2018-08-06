@@ -44,6 +44,11 @@ export const selectChatLogsList = (parmes) =>{return axios.post(`${apiUrl}/chat/
 export const updateChatRelationToUserRemark = (parmes) =>{return axios.post(`${apiUrl}/chat/user/updateChatRelationToUserRemark`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
 
 /**
+* @name 推送消息已读 ${apiUrl}/chat/messageRead
+*/
+export const messageRead = (parmes) =>{return axios.post(`${apiUrl}/chat/messageRead`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
+
+/**
  * @name 连接socket ${apiUrl}/chat/init
  */
 // export const init = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
@@ -59,10 +64,7 @@ export const updateChatRelationToUserRemark = (parmes) =>{return axios.post(`${a
 * @name 推送聊天消息 ${apiUrl}/chat/inmessage
 */
 // export const delectChatRelation = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
-/**
-* @name 推送消息已读 ${apiUrl}/chat/messageRead
-*/
-// export const delectChatRelation = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};
+
 /**
 * @name 查询和对方的未读消息总数 ${apiUrl}/chat/user/selectNotReadCountNumber
 */

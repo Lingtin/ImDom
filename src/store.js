@@ -35,6 +35,7 @@ export default new Vuex.Store({
   },
   actions: {
     init({state,commit,dispatch},searchId){
+      console.log(searchId)
           Toast.loading({
             duration: 0,       // 持续展示 toast
             forbidClick: true, // 禁用背景点击
@@ -61,6 +62,7 @@ export default new Vuex.Store({
                           item.finally_chat_message = Body.message;
                         };
                       });
+                      
                     });
                   });
                   commit("addstompClient",stompClient)

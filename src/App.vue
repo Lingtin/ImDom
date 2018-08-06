@@ -9,9 +9,8 @@
 <script>
 export default {
   created(){
-    var reg = new RegExp("(^|&)my_user_id=([^&]*)(&|$)");
-     var r = window.location.href.substr(2).match(reg);
-     console.log(r)
+    var reg = new RegExp("(^|&)token=([^&]*)(&|$)");
+     var r = window.location.href.split("?")[1].match(reg);
     if(r){
       this.$store.dispatch('init',unescape(r[2]));
     }else{

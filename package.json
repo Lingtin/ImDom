@@ -10,6 +10,7 @@
   "dependencies": {
     "@stomp/stompjs": "^4.0.7",
     "axios": "^0.18.0",
+    "emoji-mart-vue": "^2.6.4",
     "moment": "^2.22.2",
     "qs": "^6.5.2",
     "sockjs-client": "^1.1.5",

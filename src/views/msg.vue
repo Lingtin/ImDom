@@ -5,45 +5,58 @@
       left-text="返回" :z-index="100"
       left-arrow @click-left="back"
     />
-      <div class='msg-centent'>
-        <div class='msg-onload'><span @click="onRefresh">加载更多</span></div>
+      <div class='msg-centent' id="msgcentent">
+        <div class='msg-onload' v-if="data.nextPage != 0"><span @click="onRefresh">加载更多</span></div>
         <template v-for='item in data.list'>
-          <div class='meg-send' v-if='item.my_user_id == msg.my_user_id'>
+          <div class='meg-send' v-if='item.send_or_receive == 1'>
               <div class='msg-imghead'></div>
-              <div class='msg-messagecon'>
-                &nbsp;{{item.message}}
-              </div>
+              <pre class='msg-messagecon'>{{item.message}}</pre>
           </div>
           
           <div class='msg-received' v-else>
               <div class='msg-imghead'></div>
-              <div class='msg-messagecon'>
-                {{item.message}}&nbsp;
-              </div>
+              <pre class='msg-messagecon'>{{item.message}}</pre>
           </div>
-        </template>
+        </template>  
+                                                                                                                  
+        <!-- <emoji emoji="blush" set="emojione" :size="16" />
+
+        <picker title="Pick your emoji…" emoji="people" /> -->
+        <!-- <nimble-picker set="messenger" :data="data" /> -->
+        <!-- <picker :custom="customEmojis" :showPreview="false" :showSearch="false" :showSkinTones="false"/> -->
       </div>
 
-     <!-- <div class='msg-sendarea'>
+     <div class='msg-sendarea'>
         <div class='msg-nav'>
           <div class='msg-plugkuai'>快捷短语</div>
         </div>
         <div class='msg-sendmsg'>
           <div class='msg-input'>
-            <textarea class='msg-area' v-model='msg.message' wrap="hard"></textarea>
+            <textarea class='msg-area' :style='{height:textareaH+"px"}' v-model='msg.message' wrap="hard"></textarea>
           </div>
           <div class='msg-sendbtn'>
             <button class='msg-btn' @click="sendMessage">发送</button>
           </div>
         </div>
-     </div> -->
+     </div>
   </div>
 </template>
 
 <script>
 import {mapState,mapGetters} from 'vuex';
-import {apiUrl,selectChatLogsList} from '@/api/api.js';
+import {apiUrl,selectChatLogsList,messageRead} from '@/api/api.js';
+import { Picker,NimblePicker,Emoji  } from 'emoji-mart-vue'
 
+const customEmojis = [
+  {
+    name: 'Octocat',
+    short_names: ['octocat'],
+    text: '',
+    emoticons: [],
+    keywords: ['github'],
+    imageUrl: 'https://assets-cdn.github.com/images/icons/emoji/octocat.png?v7'
+  }
+]
 export default {
   name:"msg",
   data(){
@@ -56,11 +69,15 @@ export default {
       },
       pageNum:1,
       data:{
-        list:[]
+        list:[],
+        lastPage:1
       },
-      disableded:true
+      disableded:true,
+      textareaH:24,
+      customEmojis:customEmojis
     }
   },
+  components:{Picker,NimblePicker,Emoji},
   computed:{
     ...mapState(["userids","stompClient"]),
     ...mapGetters(["newMsg"]),
@@ -71,6 +88,11 @@ export default {
   watch:{
     "msg.message"(val){
       this.disableded=Boolean(val)
+      if (val) {
+        var height = (val.split("\n").length) * 18;
+        height = (val.split("\n").length) > 4?4 * 18 : height;
+        this.textareaH = height==18?24:height;
+      }
     },
     newMsg(Body){
       if (Body.to_user_id == this.msg.to_user_id) {
@@ -80,7 +102,8 @@ export default {
           "logs_id":"b6d046cd27844786b5c5e6fe751e6e55",
           "message":Body.message,
           "my_user_id":Body.to_user_id,
-          "to_user_id":"u2"
+          "to_user_id":Body.my_user_id,
+          "send_or_receive":Body.send_or_receive
         };
         this.data.list.push(msg);
       };
@@ -89,8 +112,12 @@ export default {
   mounted(){
     this.msg = this.$route.query;
     this.msg.my_user_id = this.userids.user_id;
-    console.log(this.msg)
     this.selectChatLogs();
+    window.scrollTo(0,document.body.scrollHeight)
+    var msgCentent = document.getElementById("msgcentent");
+    msgCentent.scrollTop = msgCentent.scrollHeight
+    console.log(msgCentent.scrollTop)
+     console.log(msgCentent.offsetHeight)
   },
   methods:{
     sendMessage(){
@@ -101,8 +128,11 @@ export default {
 				"logs_id":"fc710088f7224edebd70b285ce8faf58",
 				"message":this.msg.message,
 				"my_user_id":this.msg.my_user_id,
-				"to_user_id":this.msg.to_user_id
+        "to_user_id":this.msg.to_user_id,
+        "send_or_receive":1
       })
+      this.msg.message="";
+      this.textareaH=24;
     },
     selectChatLogs(){
       this.msg.pageNum = 1;
@@ -110,6 +140,7 @@ export default {
         if (data.success) {
           data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
           this.data = data.data;
+          this.msgRead();
         }
       });
     },
@@ -125,11 +156,22 @@ export default {
           data.data.list.forEach((item)=>{
             this.data.list.unshift(item)
           });
+          this.data.nextPage = data.data.nextPage;
+          this.msgRead();
           this.isLoading = false;
         }else{
           this.isLoading = false;
         }
       });
+    },
+    msgRead(){ // 消息已读
+      var msg = [];
+      this.data.list.filter(item=>{
+        msg.push(item.logs_id)
+      });
+      // console.log(msg)
+      // messageRead(msg);
+      this.stompClient.send("/chat/messageRead",{},JSON.stringify(msg))
     }
   }
 }
@@ -161,16 +203,17 @@ $HEAD_H:56px;
 .msg-centent{
   width: 100%;
   height:100%;
-  margin-top:56px; 
+  padding:56px 0 120px 0; 
   overflow-y:auto;
   overflow-x: hidden;
   .msg-onload{
     text-align: center;
-    font-size: 16px;
+    font-size: 14px;
     >span{
       cursor: pointer;
       height: 40px;
       line-height: 40px;
+      color: #3EA5FF;
       &:hover{
         color: #3EA5FF;
       }
@@ -193,7 +236,7 @@ $HEAD_H:56px;
 
     .msg-messagecon{
       border: 1px solid #ddd;
-      max-width: 200px;
+      max-width: 70vw;
       min-width: 4px;
       float: right;
       // height: 24px;
@@ -203,6 +246,7 @@ $HEAD_H:56px;
       line-height: 18px;
       color: #333;
       word-wrap: break-word;
+      white-space: pre-wrap;
       padding: 4px 8px 4px 6px;
       position: relative;
   //     border-top: 90px solid transparent;
@@ -319,12 +363,12 @@ $HEAD_H:56px;
       width: calc(100% - 80px);
       float: left;
       .msg-area{
-        font-size: 14px;
+        font-size: 16px;
         width: 100%;
-        height: 24px;
         border: none;
         padding:4px;
         line-height: 24px;
+        height: 24px;
         resize: none;
         border-radius: 4px;
         outline:none;
