@@ -49,6 +49,16 @@ export const updateChatRelationToUserRemark = (parmes) =>{return axios.post(`${a
 export const messageRead = (parmes) =>{return axios.post(`${apiUrl}/chat/messageRead`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
 
 /**
+* @name 修改用户信息 ${apiUrl}/chat/user/updateUserInfo
+*/
+export const updateUserInfo = (parmes) =>{return axios.post(`${apiUrl}/chat/user/updateUserInfo`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
+
+/**
+* @name 获取上传签名 ${apiUrl}/chat/user/getUploadSign
+*/
+export const getUploadSign = (parmes) =>{return axios.post(`${apiUrl}/chat/user/getUploadSign`,qs.stringify(parmes)).then((res) => res.data).catch(error=>error)};
+
+/**
  * @name 连接socket ${apiUrl}/chat/init
  */
 // export const init = (parmes) =>{return axios.post(`${apiUrl}/chat/user/selectUserInfo`,parmes).then((res) => res.data).catch(error=>error)};

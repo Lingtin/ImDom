@@ -1,4 +1,4 @@
-import { Login, apiUrl, selectChatRelationList, selectUserInfo } from '@/api/api.js';
+import { Login, apiUrl, getUploadSign, selectChatRelationList, selectUserInfo } from '@/api/api.js';
 
 import SockJS from 'sockjs-client'
 import Stomp from '@stomp/stompjs';
@@ -20,7 +20,8 @@ export default new Vuex.Store({
     userInfo:{},
     userList:{},
     bodymsg:{},
-    newMsg:{}
+    newMsg:{},
+    imgUrl:'https://image.ximiyun.cn'
   },
   mutations: {
     addUserIds(state,info){
@@ -31,11 +32,14 @@ export default new Vuex.Store({
     },
     updateRemake(state,info){
       state.userList[info.index].to_user_remark = info.to_user_remark;
+    },
+    updateUserInfo(state,info){
+      state.userids.nick_name = Boolean(info.nick_name)?info.nick_name:state.userids.nick_name;
+      state.userids.user_face = Boolean(info.user_face)?info.user_face:state.userids.user_face;
     }
   },
   actions: {
     init({state,commit,dispatch},searchId){
-      console.log(searchId)
           Toast.loading({
             duration: 0,       // 持续展示 toast
             forbidClick: true, // 禁用背景点击
@@ -81,6 +85,13 @@ export default new Vuex.Store({
         if (data.success) {
           state.userList = data.data;
           Toast.clear()
+        }
+      })
+    },
+    getUploadSign({},user_id){
+      getUploadSign({user_id:user_id}).then((data) => {
+        if (data.success) {
+          console.log(data)
         }
       })
     }

@@ -4,4 +4,8 @@ const FileterTime = (val)=>{
     return TimeMatter(val,"timer")
 }
 
-export default {FileterTime}
+const FileterDateTime = (val)=>{
+    return TimeMatter(val,"000")
+}
+
+export default {FileterTime,FileterDateTime}

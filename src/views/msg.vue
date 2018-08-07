@@ -1,20 +1,25 @@
 <template>
   <div class="msg">
     <van-nav-bar class='msg-header'
-      :title="title" :fixed="true"
+      :title="title"
       left-text="返回" :z-index="100"
       left-arrow @click-left="back"
     />
       <div class='msg-centent' id="msgcentent">
         <div class='msg-onload' v-if="data.nextPage != 0"><span @click="onRefresh">加载更多</span></div>
         <template v-for='item in data.list'>
+          <div class='msg-time'>{{item.chat_time|FileterDateTime}}</div>
           <div class='meg-send' v-if='item.send_or_receive == 1'>
-              <div class='msg-imghead'></div>
+              <div class='msg-imghead'>
+                <img :src="imgUrl+userids.user_face" >
+              </div>
               <pre class='msg-messagecon'>{{item.message}}</pre>
           </div>
           
           <div class='msg-received' v-else>
-              <div class='msg-imghead'></div>
+              <div class='msg-imghead'>
+                <img :src="imgUrl+msg.to_user_face" >
+              </div>
               <pre class='msg-messagecon'>{{item.message}}</pre>
           </div>
         </template>  
@@ -79,7 +84,7 @@ export default {
   },
   components:{Picker,NimblePicker,Emoji},
   computed:{
-    ...mapState(["userids","stompClient"]),
+    ...mapState(["userids","stompClient","imgUrl"]),
     ...mapGetters(["newMsg"]),
     title(){
       return this.msg.to_user_id+'-'+(this.msg.to_is_online == 0?'离线':'在线');
@@ -106,6 +111,8 @@ export default {
           "send_or_receive":Body.send_or_receive
         };
         this.data.list.push(msg);
+        var msgCentent = document.getElementById("msgcentent");
+        setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
       };
     }
   },
@@ -113,10 +120,8 @@ export default {
     this.msg = this.$route.query;
     this.msg.my_user_id = this.userids.user_id;
     this.selectChatLogs();
-    window.scrollTo(0,document.body.scrollHeight)
-    var msgCentent = document.getElementById("msgcentent");
-    window.scrollY = window.innerHeight;
-    // screenTop
+
+    // msgCentent.addEventListener("scroll",this.handle);
   },
   methods:{
     sendMessage(){
@@ -132,6 +137,8 @@ export default {
       })
       this.msg.message="";
       this.textareaH=24;
+      var msgCentent = document.getElementById("msgcentent");
+      setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
     },
     selectChatLogs(){
       this.msg.pageNum = 1;
@@ -140,6 +147,9 @@ export default {
           data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
           this.data = data.data;
           this.msgRead();
+          // 消息至底
+          var msgCentent = document.getElementById("msgcentent");
+          setTimeout(() => { msgCentent.scrollTop = msgCentent.scrollHeight;});
         }
       });
     },
@@ -151,7 +161,6 @@ export default {
       this.msg.pageNum = this.pageNum;
       selectChatLogsList(this.msg).then((data) => {
         if (data.success) {
-          // data.data.list=JSON.parse(JSON.stringify(data.data.list.reverse()));
           data.data.list.forEach((item)=>{
             this.data.list.unshift(item)
           });
@@ -169,8 +178,12 @@ export default {
         msg.push(item.logs_id)
       });
       // console.log(msg)
-      // messageRead(msg);
       this.stompClient.send("/chat/messageRead",{},JSON.stringify(msg))
+    },
+    handle(e){
+      if (e.target.scrollTop == 0) {
+        this.onRefresh();
+      };
     }
   }
 }
@@ -188,6 +201,12 @@ export default {
 
 <style lang="scss" scoped>
 $HEAD_H:56px;
+@mixin img{
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  vertical-align: top;
+}
 
 .msg-header{
   width: 100%;
@@ -200,11 +219,19 @@ $HEAD_H:56px;
 }
 
 .msg-centent{
-  width: 100%;
-  height:100%;
-  padding:56px 0 120px 0; 
-  overflow-y:auto;
-  overflow-x: hidden;
+  width: 100vw;
+  height: calc(100vh - 148px);
+  overflow:auto;
+  overflow-x:hidden;
+  .msg-time{
+    color: #C9CED3;
+    border-radius: 4px;
+    width: 120px;
+    margin: 0 auto;
+    font-size: 10px;
+    padding: 4px;
+    transform: scale(0.92);
+  }
   .msg-onload{
     text-align: center;
     font-size: 14px;
@@ -219,6 +246,18 @@ $HEAD_H:56px;
     }
     
   }
+  @mixin messagecon{
+    border: 1px solid #ddd;
+      max-width: 70vw;
+      min-width: 4px;
+      margin: 8px 0;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 18px;
+      color: #333;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+  }
   .meg-send{
     width: 100%;
     clear: both;
@@ -231,26 +270,16 @@ $HEAD_H:56px;
       border-radius:50%;
       float: right;
       margin:8px 14px;
+      >img{
+        @include img;
+      }
     }
 
     .msg-messagecon{
-      border: 1px solid #ddd;
-      max-width: 70vw;
-      min-width: 4px;
+      @include messagecon;
       float: right;
-      // height: 24px;
-      margin: 8px 0;
-      border-radius: 4px;
-      font-size: 14px;
-      line-height: 18px;
-      color: #333;
-      word-wrap: break-word;
-      white-space: pre-wrap;
       padding: 4px 8px 4px 6px;
       position: relative;
-  //     border-top: 90px solid transparent;
-  // border-right: 100px solid black;
-  // border-bottom: 100px solid transparent;
       &::before{
         content:'';
         display: block;
@@ -286,24 +315,15 @@ $HEAD_H:56px;
       border-radius:50%;
       float: left;
       margin:8px 14px;
+      >img{
+        @include img;
+      }
     }
     .msg-messagecon{
-      border: 1px solid #ddd;
-      max-width: 200px;
-      min-width: 56px;
+      @include messagecon;
       float: left;
-      // height: 24px;
-      margin: 8px 0;
-      border-radius: 4px;
-      font-size: 14px;
-      line-height: 18px;
-      color: #333;
-      word-wrap: break-word;
       padding: 4px 6px;
       position: relative;
-  //     border-top: 90px solid transparent;
-  // border-right: 100px solid black;
-  // border-bottom: 100px solid transparent;
       &::before{
         content:'';
         display: block;

@@ -1,28 +1,30 @@
-<!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!-->
-<html class="no-js">
-<!--<![endif]-->
-
+<!DOCTYPE> 
+<html> 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title></title>
-    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1.0, user-scalable=0">
-    <meta name="description" content="Free Web Based iPhone Web2.0 Application Simulator for Safari" />
-    <meta name="keywords" content="iphone, simulator, tester, safari, web2.0, development, browser, debugging, tool, software, free"
-    />
-    <link rel="stylesheet" href="">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="滚动条, scrollbar, 页面底部, 聊天窗口, " />
+    <meta name="description" content="有些时候（如开发聊天程序），我们需要将将滚动条（scrollbar）保持在最底部，比如聊天窗口，最新发出和收到的信息要显示在最 下方，如果要看到最下方的内容，就必须保证滚动条保持在最底部。" />
+    <title>将滚动条（scrollbar）保持在最底部的方法 - 滚动条, scrollbar, 页面底部, 聊天窗口, </title>
 </head>
+<body>
+    <div id="example">
+        <h3 id="example_title">将滚动条（scrollbar）保持在最底部的方法</h3>
+        <div id="example_main">
+            <script type="text/javascript">
+                function add()
+                {
+                    var now = new Date();
+                    var div = document.getElementById('scrolldIV');
+                    div.innerHTML = div.innerHTML + 'time_' + now.getTime() + '<br />';
+                    div.scrollTop = div.scrollHeight;
+                }
+            </script>
+            <span class="notice">请点击“插入一行”按钮，插入最新信息，当出现滚动条时，滚动条将自动保持在底部。</span><br />
 
-<body ontouchstart>
-    <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
-
-    <iframe src="index.html" scrolling="yes" width="320" height="520"></iframe>
+            <div id="scrolldIV" style="overflow:auto; height: 100px; width: 400px; border: 1px solid #999;">
+            </div>
+            <input type="button" value="插入一行" onclick="add();">
+        </div>
+    </div>
 </body>
-
 </html>

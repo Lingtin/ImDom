@@ -3,10 +3,10 @@
      <div class='home-header'>
        <div class='home-headeimg'>
          <div class='home-imgbox'>
-           <img :src="'https://image.ximiyun.cn'+userids.user_face" v-if='userids.user_face'>
+           <img :src="imgUrl+userids.user_face" v-if='userids.user_face'>
          </div>
        </div>
-       <div class='home-title'>{{userids.nick_name}}</div>
+       <div class='home-title' @click="editnickname">{{userids.nick_name}}</div>
        <div></div>
      </div>
      <div class='home-list'>
@@ -19,7 +19,7 @@
               <van-cell-swipe :right-width="160">
                 <van-cell-group>
                   <div class="img-header">
-                    <img :src="'https://image.ximiyun.cn'+item.to_user_face" v-if='item.to_user_face'>
+                    <img :src="imgUrl+item.to_user_face" v-if='item.to_user_face'>
                     <div class='img-default' v-else></div>
                   </div>
                   <div class='home-cent' @click="onchatname(item)">
@@ -43,10 +43,15 @@
         </van-pull-refresh>
      </div>
 
-    <!-- 修改备注 -->
+    <!-- edit remark -->
      <van-dialog v-model="show" show-cancel-button :before-close="beforeClose">
         <div class='dialogtitle'>修改备注</div>
-        <van-field v-model="remarkData.to_user_remark" label="备注" placeholder="请输入备注"/>
+        <van-field class='fieldval' v-model="remarkData.to_user_remark" label="备注：" placeholder="请输入备注" :border="true"/>
+      </van-dialog>
+    <!-- edit nick name -->
+     <van-dialog v-model="nicknameShow" show-cancel-button :before-close="editUserInfo">
+        <div class='dialogtitle'>修改昵称</div>
+        <van-field class='fieldval' v-model="nicknameData.nick_name" label="昵称：" placeholder="请输入备注" :border="true"/>
       </van-dialog>
   </div>
 </template>
@@ -54,7 +59,10 @@
 <script>
 import {mapState,mapMutations} from 'vuex';
 import { PullRefresh  } from 'vant';
-import {selectChatRelationList,delectChatRelation,updateChatRelationToUserRemark} from '@/api/api.js';
+import {selectChatRelationList,
+delectChatRelation,
+updateChatRelationToUserRemark,
+updateUserInfo} from '@/api/api.js';
 
 export default {
   name: 'home',
@@ -68,16 +76,23 @@ export default {
           relation_id:"",
           to_user_remark:""
       },
-      indexds:0
+      indexds:0,
+      nicknameShow:false,
+      nicknameData:{
+        user_id:"",
+        nick_name:"",
+        user_face:""
+      }
     }
   },
   mounted(){
     // 查询联系人列表
     this.$store.dispatch("selectChatList");
+    this.$store.dispatch("getUploadSign",this.userids.user_id)
   },
-  computed:{...mapState(["userids","userList"])},
+  computed:{...mapState(["userids","userList","imgUrl"])},
   methods:{
-    ...mapMutations(["updateRemake"]),
+    ...mapMutations(["updateRemake","updateUserInfo"]),
     onRefresh() {// 下拉刷新
       setTimeout(() => {
         this.$store.dispatch("selectChatList");
@@ -115,7 +130,6 @@ export default {
     },
     beforeClose(action, done) { //修改备注 弹出框关闭
       if (action === 'confirm') {
-        console.log(this.remarkData)
         updateChatRelationToUserRemark(this.remarkData).then((data) => {
           if (data.success) {
             // setTimeout(done, 1000);
@@ -132,10 +146,41 @@ export default {
       } else {
         done();
       };
+    },
+    editnickname(){//  修改 nickname 显示 dialog
+        this.nicknameShow=true;
+        this.nicknameData.user_id = this.userids.user_id;
+        this.nicknameData.nick_name = this.userids.nick_name;
+    },
+    editUserInfo(action, done){
+      if (action === 'confirm') {
+        updateUserInfo(this.nicknameData).then((data) => {
+          if (data.success) {
+            this.updateUserInfo(this.nicknameData);
+            done();
+          }
+        });
+      }else {
+        done();
+      };
     }
   }
 }
 </script>
+
+<style lang="scss">
+.fieldval{
+  .van-field__control{
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 4px 10px;
+  }
+  .van-cell__title{
+    text-align: right;
+    line-height: 34px;
+  }
+}
+</style>
 
 <style lang="scss" scoped>
 $HEAD_H:56px;
@@ -284,5 +329,7 @@ $HEAD_H:56px;
   }
   
 }
+
+
 </style>
 
