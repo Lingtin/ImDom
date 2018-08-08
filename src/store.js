@@ -1,4 +1,10 @@
-import { Login, apiUrl, getUploadSign, selectChatRelationList, selectUserInfo } from '@/api/api.js';
+import {
+  Login,
+  apiUrl,
+  getUploadSign,
+  selectChatRelationList,
+  selectUserInfo
+} from '@/api/api.js';
 
 import SockJS from 'sockjs-client'
 import Stomp from '@stomp/stompjs';
@@ -21,7 +27,8 @@ export default new Vuex.Store({
     userList:{},
     bodymsg:{},
     newMsg:{},
-    imgUrl:'https://image.ximiyun.cn'
+    imgUrl:'https://image.ximiyun.cn',
+    UploadSign:{}
   },
   mutations: {
     addUserIds(state,info){
@@ -80,18 +87,20 @@ export default new Vuex.Store({
         }
       });
     },
-    selectChatList({state,commit}){ // 获取联系人列表
+    selectChatList({state,commit,dispatch}){ // 获取联系人列表
       selectChatRelationList({user_id:state.userids.user_id}).then((data) => {
         if (data.success) {
           state.userList = data.data;
-          Toast.clear()
+          Toast.clear();
+          // 获取上传签名
+          dispatch("getUploadSign",state.userids.user_id)
         }
       })
     },
-    getUploadSign({},user_id){
+    getUploadSign({state},user_id){ // 获取上传签名
       getUploadSign({user_id:user_id}).then((data) => {
         if (data.success) {
-          console.log(data)
+          state.UploadSign = data.data;
         }
       })
     }

@@ -1,10 +1,11 @@
 <template>
   <div class="msg">
-    <van-nav-bar class='msg-header'
-      :title="title"
-      left-text="返回" :z-index="100"
-      left-arrow @click-left="back"
-    />
+    <van-nav-bar class='msg-header' left-text="返回" 
+    :z-index="100" left-arrow @click-left="back">
+      <div slot='title'>
+          {{title}}<div class='msg-unreload' v-if="unread_message_number!=0">{{unread_message_number}}</div>
+      </div>
+    </van-nav-bar>
       <div class='msg-centent' id="msgcentent">
         <div class='msg-onload' v-if="data.nextPage != 0"><span @click="onRefresh">加载更多</span></div>
         <template v-for='item in data.list'>
@@ -79,12 +80,13 @@ export default {
       },
       disableded:true,
       textareaH:24,
-      customEmojis:customEmojis
+      customEmojis:customEmojis,
+      unread_message_number:0
     }
   },
   components:{Picker,NimblePicker,Emoji},
   computed:{
-    ...mapState(["userids","stompClient","imgUrl"]),
+    ...mapState(["userids","stompClient","imgUrl","userList"]),
     ...mapGetters(["newMsg"]),
     title(){
       return this.msg.to_user_id+'-'+(this.msg.to_is_online == 0?'离线':'在线');
@@ -114,14 +116,20 @@ export default {
         var msgCentent = document.getElementById("msgcentent");
         setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
       };
+    },
+    userList(userList){
+      userList.forEach((item)=>{
+        if (item.to_user_id == this.msg.to_user_id) {
+          this.unread_message_number = item.unread_message_number;
+        }
+      });
     }
   },
   mounted(){
     this.msg = this.$route.query;
     this.msg.my_user_id = this.userids.user_id;
     this.selectChatLogs();
-
-    // msgCentent.addEventListener("scroll",this.handle);
+    this.unread_message_number = this.$route.unread_message_number;
   },
   methods:{
     sendMessage(){
@@ -150,6 +158,8 @@ export default {
           // 消息至底
           var msgCentent = document.getElementById("msgcentent");
           setTimeout(() => { msgCentent.scrollTop = msgCentent.scrollHeight;});
+
+          this.$store.dispatch("selectChatList");
         }
       });
     },
@@ -166,6 +176,8 @@ export default {
           });
           this.data.nextPage = data.data.nextPage;
           this.msgRead();
+
+          this.$store.dispatch("selectChatList");
           this.isLoading = false;
         }else{
           this.isLoading = false;
@@ -216,19 +228,32 @@ $HEAD_H:56px;
   line-height: $HEAD_H;
   color: #fff;
   outline: none;
+  .msg-unreload{
+    min-width: 22px;
+    height: 18px;
+    line-height: 18px;
+    font-size: 12px;
+    background: #f76666;
+    color: #fff;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 0 6px;
+    vertical-align: 2px;
+  }
 }
 
 .msg-centent{
   width: 100vw;
-  height: calc(100vh - 148px);
-  overflow:auto;
-  overflow-x:hidden;
+  height: calc(100vh - 213px);
+  overflow: auto;
+  overflow-x: hidden;
+  padding-bottom: 65px;
   .msg-time{
     color: #C9CED3;
     border-radius: 4px;
     width: 120px;
     margin: 0 auto;
-    font-size: 10px;
+    font-size: 12px;
     padding: 4px;
     transform: scale(0.92);
   }

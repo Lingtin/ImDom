@@ -10,12 +10,17 @@
 export default {
   created(){
     var reg = new RegExp("(^|&)token=([^&]*)(&|$)");
-     var r = window.location.href.split("?")[1].match(reg);
-    if(r){
-      this.$store.dispatch('init',unescape(r[2]));
+    if (window.location.href.split("?")[1]) {
+       var r = window.location.href.split("?")[1].match(reg);
+      if(r){
+        this.$store.dispatch('init',unescape(r[2]));
+      }else{
+        this.$store.dispatch('init',"u2");
+      }
     }else{
-      this.$store.dispatch('init',"u2");
+      // alert("请进入正确的请求地址。");
     }
+    
   }
 }
 </script>
@@ -36,6 +41,9 @@ html,body{
 }
 input,textarea{
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
+}
+.curpoint{
+  cursor: pointer;
 }
 .view{
   margin: 0 auto;

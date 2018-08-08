@@ -1,47 +1,25 @@
 <template>
-  <demo-section name="pull-refresh">
-    <van-cell-swipe :right-width="65" :left-width="65" :on-close="onClose">
-        <span slot="left">选择</span>
-        <van-cell-group>
-            <van-cell title="单元格" value="内容" />
-        </van-cell-group>
-        <span slot="right">删除</span>
-    </van-cell-swipe>
-  </demo-section>
+  <div>
+    <emoji emoji="blush" set="messenger" :size="24" Dataserts="Datasets"/>
+
+        <!-- <picker title="Pick your emoji…" emoji="people" /> -->
+        <!-- <nimble-picker set="emojione" /> -->
+        <picker set="messenger" Dataserts="Datasets" :showPreview="false" :showSearch="false" :showSkinTones="false"/>
+  </div>
 </template>
 
 <script>
-import VantDoc, { DemoBlock, DemoSection } from 'vant-doc';
-import {Dialog} from 'vant';
+import { Picker,NimblePicker,Emoji  } from 'emoji-mart-vue'
 
 export default {
   data() {
     return {
       count: 0,
-      isLoading: false
     };
   },
-  components:{
-      'demo-block':DemoBlock,
-      'demo-section':DemoSection
-  },
+  components:{Picker,NimblePicker,Emoji},
   methods: {
-    onClose(clickPosition, instance) {
-      switch (clickPosition) {
-        case 'left':
-        case 'cell':
-        case 'outside':
-          instance.close();
-          break;
-        case 'right':
-          Dialog.confirm({
-            message: '确定删除吗？'
-          }).then(() => {
-            instance.close();
-          });
-          break;
-      }
-    }
+   
   }
 };
 </script>

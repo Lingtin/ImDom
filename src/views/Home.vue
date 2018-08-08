@@ -2,11 +2,11 @@
   <div class="home">
      <div class='home-header'>
        <div class='home-headeimg'>
-         <div class='home-imgbox'>
+         <div class='home-imgbox curpoint'>
            <img :src="imgUrl+userids.user_face" v-if='userids.user_face'>
          </div>
        </div>
-       <div class='home-title' @click="editnickname">{{userids.nick_name}}</div>
+       <div class='home-title curpoint' @click="editnickname">{{userids.nick_name}}</div>
        <div></div>
      </div>
      <div class='home-list'>
@@ -88,7 +88,6 @@ export default {
   mounted(){
     // 查询联系人列表
     this.$store.dispatch("selectChatList");
-    this.$store.dispatch("getUploadSign",this.userids.user_id)
   },
   computed:{...mapState(["userids","userList","imgUrl"])},
   methods:{
