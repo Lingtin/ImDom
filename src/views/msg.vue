@@ -208,28 +208,14 @@ export default {
       console.log(this.UploadSign)
 
       var sign={
-        accessid:this.UploadSign.accessid,
-        Filename:"",
-        key:"",
+        Filename:file.file.name,
+        key:file.file.name,
         policy:this.UploadSign.policy,
-        OSSAccessKeyId:"",
+        OSSAccessKeyId:this.UploadSign.accessid,
         success_action_status:"200",
-        signature:this.UploadSign.signature
+        signature:this.UploadSign.signature,
+        file:{}
       }
-      // 'Filename': '${filename}',
-      // 'key' : '${filename}',
-      // 'policy': policyBase64,
-      // 'OSSAccessKeyId': accessid,
-      // 'success_action_status' : '200', //让服务端返回200，不设置则默认返回204
-      // 'signature': signature,
-
-      let client = new OSS({
-        accessKeyId: UploadSign.AccessKeyId,
-        accessKeySecret: UploadSign.AccessKeySecret,
-        stsToken: UploadSign.SecurityToken,
-        endpoint: '<oss endpoint>',
-        bucket: '<Your bucket name>'
-      });
 
     }
   }
