@@ -35,6 +35,11 @@
      <div class='msg-sendarea'>
         <div class='msg-nav'>
           <div class='msg-plugkuai'>快捷短语</div>
+          <div class="msg-plugkuai">
+            <van-uploader :after-read="onRead" accept="image/gif, image/jpeg">
+              <van-icon name="photo" />
+            </van-uploader>
+          </div>
         </div>
         <div class='msg-sendmsg'>
           <div class='msg-input'>
@@ -86,7 +91,7 @@ export default {
   },
   components:{Picker,NimblePicker,Emoji},
   computed:{
-    ...mapState(["userids","stompClient","imgUrl","userList"]),
+    ...mapState(["userids","stompClient","imgUrl","userList","UploadSign"]),
     ...mapGetters(["newMsg"]),
     title(){
       return this.msg.to_user_id+'-'+(this.msg.to_is_online == 0?'离线':'在线');
@@ -196,6 +201,36 @@ export default {
       if (e.target.scrollTop == 0) {
         this.onRefresh();
       };
+    },
+    onRead(file){ // 上传文件
+      console.log(file)
+
+      console.log(this.UploadSign)
+
+      var sign={
+        accessid:this.UploadSign.accessid,
+        Filename:"",
+        key:"",
+        policy:this.UploadSign.policy,
+        OSSAccessKeyId:"",
+        success_action_status:"200",
+        signature:this.UploadSign.signature
+      }
+      // 'Filename': '${filename}',
+      // 'key' : '${filename}',
+      // 'policy': policyBase64,
+      // 'OSSAccessKeyId': accessid,
+      // 'success_action_status' : '200', //让服务端返回200，不设置则默认返回204
+      // 'signature': signature,
+
+      let client = new OSS({
+        accessKeyId: UploadSign.AccessKeyId,
+        accessKeySecret: UploadSign.AccessKeySecret,
+        stsToken: UploadSign.SecurityToken,
+        endpoint: '<oss endpoint>',
+        bucket: '<Your bucket name>'
+      });
+
     }
   }
 }
@@ -395,6 +430,7 @@ $HEAD_H:56px;
     .msg-plugkuai{
       font-size: 14px;
       color: #666;
+      margin-right: 6px;
     }
   }
   .msg-sendmsg{

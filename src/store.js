@@ -43,6 +43,9 @@ export default new Vuex.Store({
     updateUserInfo(state,info){
       state.userids.nick_name = Boolean(info.nick_name)?info.nick_name:state.userids.nick_name;
       state.userids.user_face = Boolean(info.user_face)?info.user_face:state.userids.user_face;
+    },
+    updataUploadSign(state,info){
+      state.UploadSign = info;
     }
   },
   actions: {
@@ -97,10 +100,10 @@ export default new Vuex.Store({
         }
       })
     },
-    getUploadSign({state},user_id){ // 获取上传签名
+    getUploadSign({commit},user_id){ // 获取上传签名
       getUploadSign({user_id:user_id}).then((data) => {
         if (data.success) {
-          state.UploadSign = data.data;
+          commit("updataUploadSign",data.data);
         }
       })
     }

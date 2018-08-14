@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@stomp/stompjs": "^4.0.7",
+    "ali-oss": "^6.0.1",
     "axios": "^0.18.0",
     "emoji-mart-vue": "^2.6.4",
     "moment": "^2.22.2",
