@@ -57,6 +57,7 @@
 import {mapState,mapGetters} from 'vuex';
 import {apiUrl,selectChatLogsList,messageRead} from '@/api/api.js';
 import { Picker,NimblePicker,Emoji  } from 'emoji-mart-vue'
+import axios from 'axios';
 
 const customEmojis = [
   {
@@ -203,19 +204,27 @@ export default {
       };
     },
     onRead(file){ // 上传文件
-      console.log(file)
+      var param = new FormData(); //创建form对象
+      param.append('name',file.file.name);
+      param.append('Filename',"headerImgs/"+file.file.name);
+      param.append('key',this.UploadSign.dir);
+      param.append('policy',this.UploadSign.policy);
+      param.append('OSSAccessKeyId',this.UploadSign.accessid);
+      param.append('success_action_status',200);
+      param.append('signature',this.UploadSign.signature);
+      param.append('file',file.file);
+      
+      axios({
+         method: 'post',
+         url: this.UploadSign.host,
+         data:param,
+         headers:{"Content-Type": "multipart/form-data"}
+      }).then((data) => {
+        console.log("成功")
+      });
 
-      console.log(this.UploadSign)
 
-      var sign={
-        Filename:file.file.name,
-        key:file.file.name,
-        policy:this.UploadSign.policy,
-        OSSAccessKeyId:this.UploadSign.accessid,
-        success_action_status:"200",
-        signature:this.UploadSign.signature,
-        file:{}
-      }
+     
 
     }
   }
