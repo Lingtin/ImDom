@@ -3,7 +3,7 @@
     <van-nav-bar class='msg-header' left-text="返回" 
     :z-index="100" left-arrow @click-left="back">
       <div slot='title'>
-          {{title}}<div class='msg-unreload' v-if="unread_message_number!=0">{{unread_message_number}}</div>
+          {{title}}<div class='msg-unreload' v-if="unread_message_number!==0">{{unread_message_number}}</div>
       </div>
     </van-nav-bar>
       <div class='msg-centent' id="msgcentent">
@@ -206,8 +206,8 @@ export default {
     onRead(file){ // 上传文件
       var param = new FormData(); //创建form对象
       param.append('name',file.file.name);
-      param.append('Filename',"headerImgs/"+file.file.name);
-      param.append('key',this.UploadSign.dir);
+      param.append('Filename',file.file.name);
+      param.append('key',this.UploadSign.dir+"/msgs/"+file.file.name);
       param.append('policy',this.UploadSign.policy);
       param.append('OSSAccessKeyId',this.UploadSign.accessid);
       param.append('success_action_status',200);
