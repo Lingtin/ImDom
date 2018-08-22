@@ -14,17 +14,23 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+userids.user_face" >
               </div>
-              <pre class='msg-messagecon'>{{item.message}}</pre>
+              <pre class='msg-messagecon'>
+                <span>{{item.message}}</span>
+                <img :src="item.message" width="150">
+              </pre>
+              
           </div>
           
           <div class='msg-received' v-else>
               <div class='msg-imghead'>
                 <img :src="imgUrl+msg.to_user_face" >
               </div>
-              <pre class='msg-messagecon'>{{item.message}}</pre>
+              <pre class='msg-messagecon'>
+                <span>{{item.message}}</span>
+                <img :src="item.message" width="150">
+              </pre>
           </div>
-        </template>  
-                                                                                                                  
+        </template>                                                                                              
         <!-- <emoji emoji="blush" set="emojione" :size="16" />
 
         <picker title="Pick your emoji…" emoji="people" /> -->
@@ -221,10 +227,30 @@ export default {
          headers:{"Content-Type": "multipart/form-data"}
       }).then((data) => {
         console.log("成功")
+      }).catch(err=>{
+        console.log(err)
+
+        this.msg.message = "https://ximiyun-image.oss-cn-hangzhou.aliyuncs.com/"+this.UploadSign.dir+"/msgs/"+file.file.name
+        this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
+        this.data.list.push({
+          "chat_time":1532682200000,
+          "is_read":0,
+          "logs_id":"fc710088f7224edebd70b285ce8faf58",
+          "message":this.msg.message,
+          "my_user_id":this.msg.my_user_id,
+          "to_user_id":this.msg.to_user_id,
+          "send_or_receive":1
+        })
+        this.msg.message="";
+        this.textareaH=24;
+        var msgCentent = document.getElementById("msgcentent");
+        setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
+        
+
       });
 
 
-     
+        
 
     }
   }
