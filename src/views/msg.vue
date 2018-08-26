@@ -14,23 +14,22 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+userids.user_face" >
               </div>
-              <pre class='msg-messagecon'>
+              <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon'>
                 <span>{{item.message}}</span>
-                <img :src="item.message" width="150">
               </pre>
-              
+              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
           
           <div class='msg-received' v-else>
               <div class='msg-imghead'>
                 <img :src="imgUrl+msg.to_user_face" >
               </div>
-              <pre class='msg-messagecon'>
+              <pre v-if="item.message_type == 1" class='msg-messagecon'>
                 <span>{{item.message}}</span>
-                <img :src="item.message" width="150">
               </pre>
+              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
-        </template>                                                                                              
+        </template>                                                                                        
         <!-- <emoji emoji="blush" set="emojione" :size="16" />
 
         <picker title="Pick your emoji…" emoji="people" /> -->
@@ -145,6 +144,7 @@ export default {
   },
   methods:{
     sendMessage(){
+      this.msg.message_type=1;
       this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
       this.data.list.push({
 				"chat_time":1532682200000,
@@ -153,6 +153,7 @@ export default {
 				"message":this.msg.message,
 				"my_user_id":this.msg.my_user_id,
         "to_user_id":this.msg.to_user_id,
+        "message_type":"1",
         "send_or_receive":1
       })
       this.msg.message="";
@@ -210,48 +211,52 @@ export default {
       };
     },
     onRead(file){ // 上传文件
-      var param = new FormData(); //创建form对象
-      param.append('name',file.file.name);
-      param.append('Filename',file.file.name);
-      param.append('key',this.UploadSign.dir+"/msgs/"+file.file.name);
-      param.append('policy',this.UploadSign.policy);
-      param.append('OSSAccessKeyId',this.UploadSign.accessid);
-      param.append('success_action_status',200);
-      param.append('signature',this.UploadSign.signature);
-      param.append('file',file.file);
-      
-      axios({
-         method: 'post',
-         url: this.UploadSign.host,
-         data:param,
-         headers:{"Content-Type": "multipart/form-data"}
-      }).then((data) => {
-        console.log("成功")
-      }).catch(err=>{
-        console.log(err)
+        getUploadSign({user_id:this.msg.my_user_id}).then(({data,success}) => {
+          if (success) {
+                var drifilename =this.UploadSign.dir+"/"+ new Date().getTime()+Math.ceil(Math.random()*1000000);
+                drifilename = drifilename.substr(1)+"."+file.file.type.split('/')[1];
+                var param = new FormData(); //创建form对象
+                param.append('name',file.file.name);
+                param.append('Filename',file.file.name);
+                param.append('key',drifilename);
+                param.append('policy',this.UploadSign.policy);
+                param.append('OSSAccessKeyId',this.UploadSign.accessid);
+                param.append('success_action_status',200);
+                param.append('signature',this.UploadSign.signature);
+                param.append('file',file.file);
+                axios({
+                  method: 'post',
+                  url: this.UploadSign.host,
+                  data:param,
+                  headers:{"Content-Type": "multipart/form-data"}
+                }).then((data) => {
+                  console.log("成功")
+                }).catch(err=>{
+                  // console.log(err)
+                  setTimeout(()=>{ 
+                    this.msg.message = drifilename;
+                    this.msg.message_type=2;
+                    this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
+                    this.data.list.push({
+                      "chat_time":1532682200000,
+                      "is_read":0,
+                      "logs_id":"fc710088f7224edebd70b285ce8faf58",
+                      "message":this.msg.message,
+                      "my_user_id":this.msg.my_user_id,
+                      "to_user_id":this.msg.to_user_id,
+                      "send_or_receive":1,
+                      "message_type":"2"
+                    })
+                    this.msg.message="";
+                    this.textareaH=24;
+                    var msgCentent = document.getElementById("msgcentent");
+                    msgCentent.scrollTop = msgCentent.scrollHeight;
+                  })
+                });
 
-        this.msg.message = "https://ximiyun-image.oss-cn-hangzhou.aliyuncs.com/"+this.UploadSign.dir+"/msgs/"+file.file.name
-        this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
-        this.data.list.push({
-          "chat_time":1532682200000,
-          "is_read":0,
-          "logs_id":"fc710088f7224edebd70b285ce8faf58",
-          "message":this.msg.message,
-          "my_user_id":this.msg.my_user_id,
-          "to_user_id":this.msg.to_user_id,
-          "send_or_receive":1
-        })
-        this.msg.message="";
-        this.textareaH=24;
-        var msgCentent = document.getElementById("msgcentent");
-        setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
-        
 
-      });
-
-
-        
-
+          }
+        });
     }
   }
 }
@@ -356,6 +361,10 @@ $HEAD_H:56px;
       }
     }
 
+    .msg-messageimgcon{
+      float: right;
+    }
+
     .msg-messagecon{
       @include messagecon;
       float: right;
@@ -399,6 +408,9 @@ $HEAD_H:56px;
       >img{
         @include img;
       }
+    }
+    .msg-messageimgcon{
+      float: left;
     }
     .msg-messagecon{
       @include messagecon;
