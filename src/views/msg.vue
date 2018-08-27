@@ -14,9 +14,7 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+userids.user_face" >
               </div>
-              <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon'>
-                <span>{{item.message}}</span>
-              </pre>
+              <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon'>{{item.message}}</pre>
               <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
           
@@ -24,9 +22,7 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+msg.to_user_face" >
               </div>
-              <pre v-if="item.message_type == 1" class='msg-messagecon'>
-                <span>{{item.message}}</span>
-              </pre>
+              <pre v-if="item.message_type == 1" class='msg-messagecon'>{{item.message}}</pre>
               <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
         </template>                                                                                        
@@ -39,7 +35,12 @@
 
      <div class='msg-sendarea'>
         <div class='msg-nav'>
-          <div class='msg-plugkuai'>快捷短语</div>
+          <div class='msg-plugkuai'>
+            <select v-model="selectonval">
+              <option value="">快捷短语</option>
+              <option>你好？</option>
+            </select>
+          </div>
           <div class="msg-plugkuai">
             <van-uploader :after-read="onRead" accept="image/gif, image/jpeg">
               <van-icon name="photo" />
@@ -78,6 +79,7 @@ export default {
   name:"msg",
   data(){
     return {
+      selectonval:"",
       isLoading:false,
       msg:{
         my_user_id: "",
@@ -141,6 +143,14 @@ export default {
     this.msg.my_user_id = this.userids.user_id;
     this.selectChatLogs();
     this.unread_message_number = this.$route.unread_message_number;
+  },
+  watch:{
+    selectonval(val){
+      if(val){
+        this.msg.message=val;
+        this.sendMessage();
+      }
+    }
   },
   methods:{
     sendMessage(){

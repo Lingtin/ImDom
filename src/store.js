@@ -1,7 +1,6 @@
 import {
   Login,
   apiUrl,
-  getUploadSign,
   selectChatRelationList,
   selectUserInfo
 } from '@/api/api.js';
@@ -92,7 +91,6 @@ export default new Vuex.Store({
           state.userList = data.data;
           Toast.clear();
           // 获取上传签名
-          dispatch("getUploadSign",state.userids.user_id)
         }
       })
     }
