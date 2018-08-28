@@ -24,8 +24,11 @@
                   </div>
                   <div class='home-cent' @click="onchatname(item)">
                     <div class='home-nickname'>{{item.to_user_remark?item.to_user_remark:item.to_user_id}}</div>
-                    <div class='home-message'>
+                    <div class='home-message' v-if="item.message_type == 1">
                       {{item.finally_chat_message?item.finally_chat_message:item.to_is_online}}
+                    </div>
+                    <div class='home-message' v-else>
+                      <span v-html="item.finally_chat_message?item.finally_chat_message:item.to_is_online"></span>
                     </div>
                   </div>
                   <div class='home-time'>
@@ -301,6 +304,9 @@ $HEAD_H:56px;
         overflow:hidden;
         text-overflow:ellipsis;
         white-space:nowrap;
+      }
+      img{
+        vertical-align: -4px;
       }
     }
     .home-time{

@@ -14,7 +14,7 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+userids.user_face" >
               </div>
-              <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon'>{{item.message}}</pre>
+              <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon' v-html="item.message"></pre>
               <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
           
@@ -22,17 +22,13 @@
               <div class='msg-imghead'>
                 <img :src="imgUrl+msg.to_user_face" >
               </div>
-              <pre v-if="item.message_type == 1" class='msg-messagecon'>{{item.message}}</pre>
+              <pre v-if="item.message_type == 1" class='msg-messagecon' v-html="item.message"></pre>
               <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
           </div>
         </template>                                                                                        
-        <!-- <emoji emoji="blush" set="emojione" :size="16" />
-
-        <picker title="Pick your emoji…" emoji="people" /> -->
-        <!-- <nimble-picker set="messenger" :data="data" /> -->
-        <!-- <picker :custom="customEmojis" :showPreview="false" :showSearch="false" :showSkinTones="false"/> -->
+        
       </div>
-
+ 
      <div class='msg-sendarea'>
         <div class='msg-nav'>
           <div class='msg-plugkuai'>
@@ -41,6 +37,8 @@
               <option>你好？</option>
             </select>
           </div>
+          <a href="javascript:;" ref = 'btn' @click = 'showEmoji = !showEmoji'>表情</a>
+          <vue-emoji v-show = 'showEmoji' ref = 'emoji' @select = 'Emojisel' @hide = 'handleHide'></vue-emoji>
           <div class="msg-plugkuai">
             <van-uploader :after-read="onRead" accept="image/gif, image/jpeg">
               <van-icon name="photo" />
@@ -49,8 +47,9 @@
         </div>
         <div class='msg-sendmsg'>
           <div class='msg-input'>
-            <textarea class='msg-area' :style='{height:textareaH+"px"}' v-model='msg.message' wrap="hard"></textarea>
-          </div>
+            <!-- <textarea class='msg-area'  v-model='msg.message' wrap="hard"></textarea> -->
+            <div contenteditable="" ref = 'edit' :style='{height:textareaH+"px"}' focus wrap="hard" class='msg-area' id="areatext"></div>
+            </div>
           <div class='msg-sendbtn'>
             <button class='msg-btn' @click="sendMessage">发送</button>
           </div>
@@ -62,8 +61,9 @@
 <script>
 import {mapState,mapGetters} from 'vuex';
 import {apiUrl,selectChatLogsList,messageRead} from '@/api/api.js';
-import { Picker,NimblePicker,Emoji  } from 'emoji-mart-vue'
 import axios from 'axios';
+import 'rui-vue-emoji/dist/vue-emoji.css';
+import VueEmoji from 'rui-vue-emoji'
 
 const customEmojis = [
   {
@@ -79,6 +79,7 @@ export default {
   name:"msg",
   data(){
     return {
+      showEmoji : false,
       selectonval:"",
       isLoading:false,
       msg:{
@@ -97,7 +98,7 @@ export default {
       unread_message_number:0
     }
   },
-  components:{Picker,NimblePicker,Emoji},
+  components:{VueEmoji},
   computed:{
     ...mapState(["userids","stompClient","imgUrl","userList","UploadSign"]),
     ...mapGetters(["newMsg"]),
@@ -106,14 +107,6 @@ export default {
     }
   },
   watch:{
-    "msg.message"(val){
-      this.disableded=Boolean(val)
-      if (val) {
-        var height = (val.split("\n").length) * 18;
-        height = (val.split("\n").length) > 4?4 * 18 : height;
-        this.textareaH = height==18?24:height;
-      }
-    },
     newMsg(Body){
       if (Body.to_user_id == this.msg.to_user_id) {
         var msg = {
@@ -136,15 +129,7 @@ export default {
           this.unread_message_number = item.unread_message_number;
         }
       });
-    }
-  },
-  mounted(){
-    this.msg = this.$route.query;
-    this.msg.my_user_id = this.userids.user_id;
-    this.selectChatLogs();
-    this.unread_message_number = this.$route.unread_message_number;
-  },
-  watch:{
+    },
     selectonval(val){
       if(val){
         this.msg.message=val;
@@ -152,8 +137,44 @@ export default {
       }
     }
   },
+  mounted(){
+    this.msg = this.$route.query;
+    this.msg.my_user_id = this.userids.user_id;
+    this.selectChatLogs();
+    this.unread_message_number = this.$route.unread_message_number;
+    
+    this.$refs.emoji.appendTo({
+      area: this.$refs.edit,
+      btn: this.$refs.btn,
+      position: 'top left'
+    });
+    
+    document.querySelector('#areatext').addEventListener("scroll",(e)=>{
+      var areatext=document.querySelector('#areatext').innerHTML;
+       this.msg.message=areatext;
+       this.disableded=Boolean(areatext)
+        if (areatext) {
+          var height = (areatext.split("</div>").length) * 18;
+          height = (areatext.split("</div>").length) > 4?4 * 18 : height;
+          this.textareaH = height==18?24:height;
+        }
+    });
+
+  },
   methods:{
+    Emojisel(e){
+      document.querySelector('#areatext').appendChild(e);
+      this.showEmoji = false;
+    },
+    hide () {
+      this.showEmoji = false;
+    },
+    handleHide (e) {
+      this.hide();
+    },
     sendMessage(){
+      this.msg.message = document.querySelector('#areatext').innerHTML;
+      if(!this.msg.message){return;};
       this.msg.message_type=1;
       this.stompClient.send(`${apiUrl}/chat/inmessage`,{},JSON.stringify(this.msg));
       this.data.list.push({
@@ -212,7 +233,6 @@ export default {
       this.data.list.filter(item=>{
         msg.push(item.logs_id)
       });
-      // console.log(msg)
       this.stompClient.send("/chat/messageRead",{},JSON.stringify(msg))
     },
     handle(e){
@@ -289,6 +309,12 @@ $HEAD_H:56px;
   height: 100%;
   border-radius: 50%;
   vertical-align: top;
+}
+
+.msg-messagecon{
+  img{
+    vertical-align: -5px;
+  }
 }
 
 .msg-header{
@@ -495,6 +521,8 @@ $HEAD_H:56px;
         resize: none;
         border-radius: 4px;
         outline:none;
+        background: #fff;
+        overflow-y: auto;
         &:focus{
           border:1px solid #3EA5FF;
           box-shadow: 0px 0 2px 2px #ddd;
