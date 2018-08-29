@@ -32,12 +32,12 @@
      <div class='msg-sendarea'>
         <div class='msg-nav'>
           <div class='msg-plugkuai'>
-            <select v-model="selectonval">
+            <select class="msg-select" v-model="selectonval">
               <option value="">快捷短语</option>
               <option>你好？</option>
             </select>
           </div>
-          <a href="javascript:;" ref = 'btn' @click = 'showEmoji = !showEmoji'>表情</a>
+          <a href="javascript:;" ref = 'btn' @click = 'showEmoji = !showEmoji' class="emoji"></a>
           <vue-emoji v-show = 'showEmoji' ref = 'emoji' @select = 'Emojisel' @hide = 'handleHide'></vue-emoji>
           <div class="msg-plugkuai">
             <van-uploader :after-read="onRead" accept="image/gif, image/jpeg">
@@ -132,7 +132,7 @@ export default {
     },
     selectonval(val){
       if(val){
-        this.msg.message=val;
+        document.querySelector('#areatext').innerHTML = val;
         this.sendMessage();
       }
     }
@@ -188,6 +188,7 @@ export default {
         "send_or_receive":1
       })
       this.msg.message="";
+      document.querySelector('#areatext').innerHTML="";
       this.textareaH=24;
       var msgCentent = document.getElementById("msgcentent");
       setTimeout(()=>{ msgCentent.scrollTop = msgCentent.scrollHeight;})
@@ -310,11 +311,14 @@ $HEAD_H:56px;
   border-radius: 50%;
   vertical-align: top;
 }
-
-.msg-messagecon{
-  img{
-    vertical-align: -5px;
-  }
+.emoji{
+    display: inline-block;
+    background: url(/img/emoji.f97d5b41.png) no-repeat center;
+    width: 16px;
+    height: 16px;
+    background-size: 100%;
+    margin: 0 10px;
+    vertical-align: 0px;
 }
 
 .msg-header{
@@ -496,10 +500,9 @@ $HEAD_H:56px;
       color: #666;
       cursor: pointer;
     }
-    .msg-plugkuai{
-      font-size: 14px;
-      color: #666;
-      margin-right: 6px;
+    .msg-select{
+      font-size: 12px;
+      vertical-align: 2px;
     }
   }
   .msg-sendmsg{

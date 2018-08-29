@@ -65,4 +65,7 @@ input,textarea{
     background-color: #777;
     border-radius: 4px;
 }
+.rui-emoji-img{
+  vertical-align: -4px;
+}
 </style>
