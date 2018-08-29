@@ -40,7 +40,7 @@
           <a href="javascript:;" ref = 'btn' @click = 'showEmoji = !showEmoji' class="emoji"></a>
           <vue-emoji v-show = 'showEmoji' ref = 'emoji' @select = 'Emojisel' @hide = 'handleHide'></vue-emoji>
           <div class="msg-plugkuai">
-            <van-uploader :after-read="onRead" accept="image/gif, image/jpeg">
+            <van-uploader :after-read="onRead" accept="image/gif, image/jpeg" style="width:20px;">
               <van-icon name="photo" />
             </van-uploader>
           </div>
