@@ -10,7 +10,7 @@ import store from './store'
 
 Object.keys(fileters).map((key)=>{
   Vue.filter(key,fileters[key])
-})
+});
 
 Vue.use(Vant);
 Vue.config.productionTip = false

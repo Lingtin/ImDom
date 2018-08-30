@@ -26,7 +26,7 @@ export default new Vuex.Store({
     userList:{},
     bodymsg:{},
     newMsg:{},
-    imgUrl:'https://image.ximiyun.cn'
+    imgUrl:'https://image.ximiyun.cn/'
   },
   mutations: {
     addUserIds(state,info){

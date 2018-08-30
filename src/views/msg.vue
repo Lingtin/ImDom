@@ -15,7 +15,7 @@
                 <img :src="imgUrl+userids.user_face" >
               </div>
               <pre v-if="item.message_type == 1 || item.message_type == ''" class='msg-messagecon' v-html="item.message"></pre>
-              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
+              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="imgUrl+item.message" width="150">
           </div>
           
           <div class='msg-received' v-else>
@@ -23,7 +23,7 @@
                 <img :src="imgUrl+msg.to_user_face" >
               </div>
               <pre v-if="item.message_type == 1" class='msg-messagecon' v-html="item.message"></pre>
-              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="'https://image.ximiyun.cn/'+item.message" width="150">
+              <img class="msg-messageimgcon" v-if="item.message_type == 2" :src="imgUrl+item.message" width="150">
           </div>
         </template>                                                                                        
         
@@ -313,7 +313,7 @@ $HEAD_H:56px;
 }
 .emoji{
     display: inline-block;
-    background: url(/img/emoji.f97d5b41.png) no-repeat center;
+    background: url('./../assets/emoji.png') no-repeat center;
     width: 16px;
     height: 16px;
     background-size: 100%;

@@ -16,7 +16,7 @@
             暂无消息,下拉刷新试试。
             </p>
             <div class='home-item' v-for='(item,index) in userList'>
-              <van-cell-swipe :right-width="160">
+              <van-swipe-cell :right-width="160">
                 <van-cell-group>
                   <div class="img-header">
                     <img :src="imgUrl+item.to_user_face" v-if='item.to_user_face'>
@@ -40,7 +40,7 @@
                   <span class='editclass' @click="showdialog(item,index)">修改备注</span>
                   <span class='delclass' @click="delectRelation(item)">删除</span>
                 </span>
-              </van-cell-swipe>
+              </van-swipe-cell>
             </div>
           </div>
         </van-pull-refresh>
